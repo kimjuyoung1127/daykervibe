@@ -1,4 +1,4 @@
-# Hackerton Schema
+# Expedition Hub Schema
 
 Last updated: 2026-03-09 (KST)
 Source: `docs/ref/hackathons/daker-handover-2026-03.md`
@@ -10,7 +10,7 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
   - `hackathonsjson/public_hackathon_detail.json`
   - `hackathonsjson/public_teams.json`
   - `hackathonsjson/public_leaderboard.json`
-- Data model goal: 멀티 해커톤 운영 포털 재사용성
+- Data model goal: 멀티 해커톤 실행 포털 재사용성
 
 ## Core Entities
 
@@ -48,7 +48,7 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 |---|---|---|---|---|
 | `id` | string | yes | public | |
 | `hackathonSlug` | string | no | public | null 허용 |
-| `name` | string | yes | public | |
+| `name` | string | yes | public | 원정대명 |
 | `intro` | string | yes | public | |
 | `isOpen` | boolean | yes | public | |
 | `lookingFor` | string[] | yes | public | |
@@ -82,13 +82,27 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 |---|---|---|---|---|
 | `id` | string | yes | team-local | |
 | `teamId` | string | yes | team-local | |
-| `title` | string | yes | team-local | |
+| `title` | string | yes | team-local | 작전실 제목 |
 | `summary` | string | yes | team-local | |
-| `submissionStage` | `'teaming' \| 'planning' \| 'web' \| 'pdf' \| 'done'` | yes | team-local | |
-| `notes` | string | no | team-local | 팀 메모 |
+| `submissionStage` | `'teaming' \| 'plan' \| 'web' \| 'pdf' \| 'done'` | yes | team-local | |
+| `nextActionLabel` | string | no | team-local | 베이스캠프 요약용 |
 | `lastUpdated` | string | yes | team-local | |
+| `notes` | string | no | team-local | 팀 메모 |
 
-### 7) `WarRoomChecklistItem`
+### 7) `WarRoomWorkflowCard`
+| field | type | required | visibility | note |
+|---|---|---|---|---|
+| `id` | string | yes | team-local | |
+| `warRoomId` | string | yes | team-local | |
+| `title` | string | yes | team-local | |
+| `column` | `'plan' \| 'web' \| 'pdf' \| 'submitted'` | yes | team-local | |
+| `order` | number | yes | team-local | 컬럼 내 정렬 |
+| `ownerLabel` | string | no | team-local | |
+| `dueLabel` | string | no | team-local | 날짜 문자열 허용 |
+| `notes` | string | no | team-local | |
+| `isBlocked` | boolean | yes | team-local | |
+
+### 8) `WarRoomChecklistItem`
 | field | type | required | visibility | note |
 |---|---|---|---|---|
 | `id` | string | yes | team-local | |
@@ -98,7 +112,7 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 | `assigneeLabel` | string | no | team-local | |
 | `dueAt` | string | no | team-local | |
 
-### 8) `Submission`
+### 9) `Submission`
 | field | type | required | visibility | note |
 |---|---|---|---|---|
 | `id` | string | yes | team-local | |
@@ -110,7 +124,7 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 | `notes` | string | no | team-local | |
 | `submittedAt` | string | no | public | |
 
-### 9) `SubmissionArtifact`
+### 10) `SubmissionArtifact`
 | field | type | required | visibility | note |
 |---|---|---|---|---|
 | `id` | string | yes | team-local | |
@@ -119,7 +133,7 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 | `url` | string | yes | team-local | |
 | `label` | string | no | team-local | |
 
-### 10) `LeaderboardEntry`
+### 11) `LeaderboardEntry`
 | field | type | required | visibility | note |
 |---|---|---|---|---|
 | `id` | string | yes | public | |
@@ -132,7 +146,7 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 | `status` | `'ranked' \| 'not_submitted'` | yes | public | |
 | `scoreBreakdown` | Record<string, number> | no | public | |
 
-### 11) `RankingProfile`
+### 12) `RankingProfile`
 | field | type | required | visibility | note |
 |---|---|---|---|---|
 | `id` | string | yes | public | |
@@ -141,7 +155,7 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 | `period` | `'7d' \| '30d' \| 'all'` | yes | public | |
 | `activitySummary` | string | no | public | |
 
-### 12) `SystemNotice`
+### 13) `SystemNotice`
 | field | type | required | visibility | note |
 |---|---|---|---|---|
 | `id` | string | yes | public | |
@@ -156,19 +170,20 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 - `private-hidden`: UI 렌더링 금지
 
 ## Local Storage Keys
-- `hackerton.hackathons`
-- `hackerton.teams`
-- `hackerton.teamMembers`
-- `hackerton.teamInvites`
-- `hackerton.warRooms`
-- `hackerton.warRoomChecklist`
-- `hackerton.submissions`
-- `hackerton.submissionArtifacts`
-- `hackerton.leaderboards`
-- `hackerton.rankings`
-- `hackerton.systemNotices`
+- `expeditionHub.hackathons`
+- `expeditionHub.teams`
+- `expeditionHub.teamMembers`
+- `expeditionHub.teamInvites`
+- `expeditionHub.warRooms`
+- `expeditionHub.warRoomWorkflowCards`
+- `expeditionHub.warRoomChecklist`
+- `expeditionHub.submissions`
+- `expeditionHub.submissionArtifacts`
+- `expeditionHub.leaderboards`
+- `expeditionHub.rankings`
+- `expeditionHub.systemNotices`
 
 ## Acceptance
 - 멀티 해커톤 구조를 설명할 수 있어야 한다.
-- 작전실, 팀 모집, 제출, 리더보드, 글로벌 랭킹이 모두 데이터 모델에 반영되어야 한다.
+- 베이스캠프 요약, 작전실 워크플로우, 제출, 리더보드, 글로벌 랭킹이 모두 데이터 모델에 반영되어야 한다.
 - 비공개 정보는 필드 수준에서 분리되어야 한다.

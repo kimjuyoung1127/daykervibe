@@ -1,28 +1,28 @@
-# Hackerton Master Plan
+# Expedition Hub Master Plan
 
 기준일: 2026-03-09 (KST)
-프로젝트: Hackerton 운영 포털
+프로젝트: Expedition Hub 해커톤 실행 포털
 
 ## 1) 현재 상태
 - SSOT 잠금 완료
-- PRD / Schema / Wireframe / Architecture 작성 필요
-- 자동화와 개발기록 체계 작성 필요
+- PRD / Schema / Wireframe / Architecture 1차 작성 완료
+- 서비스명과 핵심 개념을 `Expedition Hub`, `원정대`, `베이스캠프`, `작전실` 기준으로 재정의 중
 - 실제 앱 구현은 아직 시작 전
 
 ## 2) 현재 단계
-- Phase 1A: 문서 기반 제품 잠금
+- Phase 1B: 서비스 서사와 제출 준비 워크플로우 잠금
 
 ## 3) 우선순위
-1. PRD 작성
-2. Schema 작성
-3. Wireframe 작성
-4. Architecture 다이어그램 작성
-5. CLAUDE / automations 작성
-6. 상태 보드와 일일 로그 체계 작성
-7. 그 다음 실제 코드 구현 계획 잠금
+1. Submission 1 기획서 초안 잠금
+2. 작전실 워크플로우 스키마 잠금
+3. 와이어프레임과 아키텍처 다이어그램 정합화
+4. 프론트엔드 구현 계획 재정렬
+5. 상태 보드와 일일 로그 동기화
+6. 그 다음 실제 코드 구현 착수
 
 ## 4) 운영 규칙
 - 문서 우선
 - SSOT 우선
 - 일일 로그 누적
 - 증빙 관점으로 기록 유지
+- 확장은 기본 구현을 해치지 않는 선에서만 도입

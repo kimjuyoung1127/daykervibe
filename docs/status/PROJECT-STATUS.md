@@ -5,9 +5,9 @@ Focus Hackathon: `daker-handover-2026-03`
 
 ## Current Focus
 - SSOT 문서 잠금 완료
-- PRD / Schema / Wireframe / Architecture bootstrap 완료
-- CLAUDE orchestration bootstrap 완료
-- 상태 보드 / 증빙 기록 체계 bootstrap 완료
+- Expedition Hub 제품 서사와 핵심 용어 재정의 완료
+- PRD / Schema / Wireframe / Architecture 재정렬 진행 중
+- Submission 1 기획서 초안 구조 작성 시작
 - automation scaffold bootstrap 완료
 
 ## Canonical Source
@@ -26,21 +26,21 @@ Focus Hackathon: `daker-handover-2026-03`
 - 팀 수 `43`, 조회수 `614`, 총상금 `1,000,000원`
 
 ## Open Gaps
-- 기획서 초안 문안 미작성
+- Submission 1 문안 최종본 미작성
 - GitHub 저장소 공개 방식 미확정
 - 실제 구현용 앱 골격 미생성
-- 자동화 첫 실행 전 상태
+- 워크플로우 카드 시드 데이터 미작성
 
 ## Next Actions
-1. SSOT 기준으로 기획서 초안 작성
-2. 실제 앱 골격 초기화 계획 작성
-3. 웹 제출 체크리스트 작성
-4. PDF 증빙 섹션 구조 작성
+1. Expedition Hub 기준 기획서 초안 문안 작성
+2. 워크플로우 카드 스키마와 시드 구조 잠금
+3. 프론트엔드 구현 계획에 베이스캠프/작전실 반영
+4. 웹 제출 체크리스트 작성
 
 ## Recent Decisions
-- 단일 진실 소스는 기존 해커톤 요약 문서를 확장해 사용
+- 제품 서비스명은 `Expedition Hub`
 - 공식 안내가 사용자 수기 명세, PNG, 기존 JSON보다 우선
 - UI spec과 master plan은 SSOT 파생 문서로 유지
-- 제품은 `재사용 가능한 해커톤 운영 포털`
+- 베이스캠프는 별도 라우트가 아니라 작전실 상단 상태 요약으로 처리
+- 작전실은 팀 전용 협업 공간이 아니라 제출 준비 관리 허브로 해석
 - 기술 스택은 `Next.js + TypeScript + Tailwind + localStorage + Vercel`
-- 작전실은 팀 전용 운영 허브로 해석

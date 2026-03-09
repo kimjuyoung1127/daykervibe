@@ -1,4 +1,4 @@
-# Hackerton Wireframe
+# Expedition Hub Wireframe
 
 Last Updated: 2026-03-09 (KST)
 
@@ -8,7 +8,7 @@ Last Updated: 2026-03-09 (KST)
 | `/` 랜딩 | `public/design_reference/landing_page.png` |
 | `/hackathons` 목록 | `public/design_reference/hackathon_listing.png` |
 | `/hackathons/:slug` 상세 | `public/design_reference/hackathon_detail.png` |
-| `/camp` 팀 모집 | `public/design_reference/camp_recruitment.png` |
+| `/camp` 원정대 모집 | `public/design_reference/camp_recruitment.png` |
 | `/rankings` 랭킹 | `public/design_reference/rankings.png` |
 | `/war-room/:teamId` 작전실 | `public/design_reference/war_room.png` |
 | 공통 컴포넌트 스타일 | `public/design_reference/1.png` |
@@ -55,15 +55,16 @@ Last Updated: 2026-03-09 (KST)
 ## 4. Page Wireframes
 ### 4.1 Home (`/`)
 - Hero
-  - 제품 한 줄 정의
+  - `Expedition Hub` 서비스명
+  - 한 줄 소개
   - 주요 CTA 3개
 - Featured Hackathons
   - 모집중 / 종료 카드
 - Portal Value Section
-  - 모집, 팀 구성, 작전실, 제출, 평가 이해
-- Featured Teams / Rankings Preview
+  - 해커톤 탐색, 원정대 구성, 베이스캠프, 작전실, 평가 이해
+- Rankings Preview
 - 운영 품질 증거 섹션
-  - SSOT / PRD / Schema / Automation 카드
+  - SSOT / PRD / Schema / Workflow 카드
 - Footer CTA
 
 ### 4.2 Hackathons (`/hackathons`)
@@ -97,8 +98,8 @@ Last Updated: 2026-03-09 (KST)
   - 리더보드
 - 각 섹션은 카드형 모듈
 - 팀 섹션 CTA
-  - 팀 만들기
-  - 팀 찾기
+  - 원정대 만들기
+  - 원정대 찾기
   - 초대/수락/거절 버튼 영역
 - 제출 섹션
   - 가이드
@@ -111,14 +112,14 @@ Last Updated: 2026-03-09 (KST)
 ### 4.4 Camp (`/camp`)
 - 필터 바
   - 전체 / 특정 해커톤
-- 팀 리스트 카드
-  - 팀명
+- 원정대 리스트 카드
+  - 원정대명
   - 소개
   - 모집 상태
   - 모집 포지션
   - 연락 링크
-- 팀 생성 폼
-  - 팀명
+- 원정대 생성 폼
+  - 원정대명
   - 소개
   - 모집중 여부
   - 모집 포지션
@@ -134,8 +135,18 @@ Last Updated: 2026-03-09 (KST)
   - activity summary
 
 ### 4.6 War Room (`/war-room/:teamId`)
-- 팀 요약 카드
+- 베이스캠프 요약 카드
+  - 원정대명
+  - 연결된 해커톤
+  - 현재 제출 단계
+  - 다음 해야 할 일
+  - 멤버 참여 상태
 - 제출 단계 상태 카드
+- 작전실 워크플로우 보드
+  - `기획서 준비`
+  - `웹 제출 준비`
+  - `PDF 준비`
+  - `제출 완료`
 - 체크리스트 보드
 - 팀 메모
 - 링크 관리
@@ -160,4 +171,5 @@ Last Updated: 2026-03-09 (KST)
 - [ ] 카드 형태와 보더 규칙 확정
 - [ ] 상태 배지 스타일 확정
 - [ ] 랜딩과 포털의 연결 톤 확정
-- [ ] 작전실 구조 확정
+- [ ] 베이스캠프 요약 구조 확정
+- [ ] 작전실 워크플로우 보드 구조 확정

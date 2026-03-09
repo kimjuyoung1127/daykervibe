@@ -1,6 +1,6 @@
-# Hackerton Architecture Diagrams
+# Expedition Hub Architecture Diagrams
 
-Hackerton 운영 포털용 Mermaid 다이어그램 모음.
+Expedition Hub 해커톤 실행 포털용 Mermaid 다이어그램 모음.
 
 ---
 
@@ -10,13 +10,14 @@ Hackerton 운영 포털용 Mermaid 다이어그램 모음.
 graph TB
   subgraph Client["Frontend (Next.js + TypeScript + Tailwind)"]
     App["App Router"]
-    Pages["Landing + Portal Pages"]
+    PublicPages["Public Portal Pages"]
+    TeamPages["Basecamp + War Room"]
     Store["Local State + localStorage"]
   end
 
   subgraph Data["Seed Data"]
     Json["hackathonsjson/*.json"]
-    Design["design_reference/1.png"]
+    Design["design_reference/*.png"]
     Docs["SSOT / PRD / Schema / Wireframe"]
   end
 
@@ -26,12 +27,17 @@ graph TB
     Pdf["PDF"]
   end
 
-  App --> Pages
-  Pages --> Store
+  App --> PublicPages
+  App --> TeamPages
+  PublicPages --> Store
+  TeamPages --> Store
   Json --> Store
-  Docs --> Pages
-  Design --> Pages
-  Pages --> Web
+  Docs --> PublicPages
+  Docs --> TeamPages
+  Design --> PublicPages
+  Design --> TeamPages
+  PublicPages --> Web
+  TeamPages --> Web
   Docs --> Pdf
   Docs --> Repo
 ```
@@ -54,8 +60,8 @@ graph TD
   Home --> Rank
   HList --> HDetail
   HDetail --> Camp
-  HDetail --> War
   Camp --> War
+  HDetail --> War
 ```
 
 ---
@@ -64,21 +70,24 @@ graph TD
 
 ```mermaid
 journey
-  title Hackerton 운영 포털 사용자 여정
+  title Expedition Hub 사용자 여정
   section 발견
     메인 랜딩 진입: 5: 참가자
     모집중 해커톤 탐색: 5: 참가자
   section 탐색
     해커톤 목록 보기: 5: 참가자
     상세 페이지에서 평가/일정 확인: 5: 참가자
-  section 팀 구성
-    팀 모집글 보기: 4: 참가자
-    팀 생성 또는 합류: 4: 팀장, 팀원
+  section 원정대
+    원정대 모집글 보기: 4: 참가자
+    원정대 생성 또는 합류: 4: 원정대장, 원정대원
+  section 베이스캠프
+    현재 단계와 다음 액션 확인: 5: 원정대장, 원정대원
+    멤버 상태 이해: 4: 원정대원
   section 작전실
-    체크리스트 확인: 5: 팀장, 팀원
-    제출 단계 상태 확인: 5: 팀장
+    플랜 카드 이동: 5: 원정대장
+    제출 링크와 체크리스트 관리: 5: 원정대장, 원정대원
   section 제출/이해
-    제출 가이드 확인: 5: 팀장
+    제출 가이드 확인: 5: 원정대장
     리더보드와 평가 이해: 4: 참가자, 심사자
 ```
 
@@ -95,6 +104,7 @@ erDiagram
   Team ||--o{ TeamMember : has
   Team ||--o{ TeamInvite : invites
   Team ||--|| WarRoom : owns
+  WarRoom ||--o{ WarRoomWorkflowCard : organizes
   WarRoom ||--o{ WarRoomChecklistItem : includes
   Submission ||--o{ SubmissionArtifact : has
 
@@ -114,6 +124,13 @@ erDiagram
     string id
     string teamId
     string submissionStage
+    string nextActionLabel
+  }
+  WarRoomWorkflowCard {
+    string id
+    string warRoomId
+    string title
+    string column
   }
   Submission {
     string id
@@ -131,11 +148,12 @@ erDiagram
 
 ```mermaid
 flowchart LR
-  A["팀 구성"] --> B["작전실 진입"]
-  B --> C["기획서 준비"]
-  C --> D["웹 URL + GitHub 준비"]
-  D --> E["PDF 준비"]
-  E --> F["리더보드/평가 이해"]
+  A["원정대 구성"] --> B["베이스캠프 상태 확인"]
+  B --> C["작전실: 기획서 준비"]
+  C --> D["작전실: 웹 제출 준비"]
+  D --> E["작전실: PDF 준비"]
+  E --> F["제출 상태 확인"]
+  F --> G["리더보드/평가 이해"]
 ```
 
 ---
@@ -148,8 +166,8 @@ graph LR
   TeamLocal["Team-local Data"]
   Hidden["Never Expose"]
 
-  Public -->|"hackathons, public teams, rankings"| TeamLocal
-  TeamLocal -->|"war room, checklist, notes, invite states"| Hidden
+  Public -->|"hackathons, public teams, rankings, submission summary"| TeamLocal
+  TeamLocal -->|"basecamp summary, workflow cards, checklist, notes, invite states"| Hidden
   Hidden["internal user info / private info / other team internals / private contacts / applicant memo"]
 ```
 
@@ -164,20 +182,20 @@ graph TD
   Schema["Schema"]
   Wire["Wireframe"]
   Arch["Architecture"]
+  Brief["Submission 1 Draft"]
   Status["Status Docs"]
   Daily["Daily Logs"]
-  Auto["Automations"]
   PDF["Final PDF Evidence"]
 
   SSOT --> PRD
   SSOT --> Schema
   SSOT --> Wire
   SSOT --> Arch
-  PRD --> Status
-  Schema --> Status
-  Wire --> Daily
-  Arch --> Daily
-  Auto --> Status
+  PRD --> Brief
+  Schema --> Brief
+  Wire --> Brief
+  Arch --> Brief
+  Brief --> Status
   Status --> PDF
   Daily --> PDF
 ```
@@ -188,8 +206,8 @@ graph TD
 - [ ] 상단바 이동
 - [ ] 상태 UI 3종
 - [ ] 상세 섹션 8개
-- [ ] 작전실
-- [ ] 팀 초대/수락/거절
+- [ ] 베이스캠프 요약
+- [ ] 작전실 워크플로우 보드
 - [ ] 제출 상태
 - [ ] `미제출`
 - [ ] GitHub + Vercel 연결
