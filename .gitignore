@@ -28,3 +28,4 @@ Thumbs.db
 desktop.ini
 .idea/
 .vscode/
+# dependencies\nnode_modules/\n\n# next.js\n.next/\nout/\n\n# production\nbuild/\n\n# debug\nnpm-debug.log*\n\n# env\n.env*.local\n\n# vercel\n.vercel\n\n# typescript\n*.tsbuildinfo\nnext-env.d.ts
