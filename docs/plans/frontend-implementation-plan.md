@@ -310,10 +310,34 @@ hackerton/
 
 ---
 
-## 7. 핵심 파일 (구현 시 참조)
+## 7. 디자인 레퍼런스 (페이지별 6장)
+
+| 파일 | 대상 라우트 | 핵심 참조 포인트 |
+|------|-----------|----------------|
+| `public/design_reference/landing_page.png` | `/` | 히어로 레이아웃, 3 CTA 버튼, 해커톤 카드 캐러셀, 포털 기능 5개 아이콘, 푸터 CTA |
+| `public/design_reference/hackathon_listing.png` | `/hackathons` | 카드 그리드 (3열), 상태 필터 탭, 상태배지+태그+기간+팀수+상금 카드 구성, 페이지네이션 |
+| `public/design_reference/hackathon_detail.png` | `/hackathons/:slug` | 상단 요약 바 5칸, 8섹션 탭 네비, 평가 루브릭 테이블, FIND TEAM/CREATE TEAM 버튼 |
+| `public/design_reference/camp_recruitment.png` | `/camp` | 해커톤 필터 바, 2열 팀 카드, 모집상태 배지, 포지션 태그, 연락하기 버튼, CREATE TEAM FAB |
+| `public/design_reference/rankings.png` | `/rankings` | 기간 필터 (7D/30D/ALL TIME), 상위 3명 포디엄 카드, 테이블 (rank/avatar/nickname/points/status) |
+| `public/design_reference/war_room.png` | `/war-room/:teamId` | 팀 요약+데드라인 카운터, 5단계 스테퍼, 칸반 3열 (Backlog/Engaged/Secured), 전술 노트, 링크 관리 |
+| `public/design_reference/1.png` | (전체) | 8비트 컴포넌트 스타일 원본 — 픽셀 보더, 카드 형태, 컬러 조합 참조 |
+
+## 8. 폰트
+
+| 폰트 | 용도 | 파일 경로 |
+|------|------|----------|
+| **Press Start 2P** | 영문 타이틀, 섹션 헤더, 버튼 라벨 (8비트 감성) | `public/fonts/press-start-2p/PressStart2P.ttf` |
+| **DungGeunMo (둥근모)** | 한글 타이틀, 본문, UI 텍스트 (한글 픽셀) | `public/fonts/DungGeunMo/DungGeunMo.ttf` |
+
+### 적용 규칙
+- `layout.tsx`에서 `next/font/local`로 로드
+- CSS 변수: `--font-pixel-en` (Press Start 2P), `--font-pixel-kr` (DungGeunMo)
+- 타이틀/헤더: 영문은 Press Start 2P, 한글은 DungGeunMo
+- 본문/소형 텍스트: DungGeunMo 또는 시스템 sans-serif fallback
+
+## 9. 핵심 문서 (구현 시 참조)
 
 - `docs/schema.md` — 12개 엔티티 정의 (타입 생성 기반)
 - `docs/wireframe.md` — 페이지별 와이어프레임
 - `docs/ref/hackathons/daker-handover-2026-03.md` — SSOT
 - `hackathonsjson/*.json` — 시드 데이터 원본
-- `public/design_reference/1.png` — 디자인 레퍼런스

@@ -1,7 +1,17 @@
 # Hackerton Wireframe
 
 Last Updated: 2026-03-09 (KST)
-Design reference: `public/design_reference/1.png`
+
+## Design References
+| 페이지 | 레퍼런스 파일 |
+|--------|-------------|
+| `/` 랜딩 | `public/design_reference/landing_page.png` |
+| `/hackathons` 목록 | `public/design_reference/hackathon_listing.png` |
+| `/hackathons/:slug` 상세 | `public/design_reference/hackathon_detail.png` |
+| `/camp` 팀 모집 | `public/design_reference/camp_recruitment.png` |
+| `/rankings` 랭킹 | `public/design_reference/rankings.png` |
+| `/war-room/:teamId` 작전실 | `public/design_reference/war_room.png` |
+| 공통 컴포넌트 스타일 | `public/design_reference/1.png` |
 
 ## 1. 디자인 방향
 - 8비트 게이머 감성
@@ -21,9 +31,9 @@ Design reference: `public/design_reference/1.png`
 - Border Dark: `#1A1A1A`
 
 ### 2.2 Typography
-- Title: pixel display style
-- Section: bold sans with thick outline feeling
-- Body: readable Korean UI sans
+- **영문 타이틀/헤더**: `Press Start 2P` (`public/fonts/press-start-2p/PressStart2P.ttf`)
+- **한글 타이틀/본문**: `DungGeunMo` (`public/fonts/DungGeunMo/DungGeunMo.ttf`)
+- Body: DungGeunMo 또는 시스템 sans-serif fallback
 - Small: compact pixel-inspired label text
 
 ### 2.3 Component Mood
