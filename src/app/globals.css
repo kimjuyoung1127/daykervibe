@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* ── Colors (wireframe.md 2.1) ── */
+  --color-dark-bg: #171314;
+  --color-dark-border: #1A1A1A;
+  --color-card-white: #F7F1E8;
+  --color-accent-orange: #F08A24;
+  --color-accent-yellow: #F7D64A;
+  --color-accent-mint: #98F0E1;
+  --color-accent-pink: #FF79C9;
+  --color-accent-purple: #A98DF8;
+
+  /* ── Fonts ── */
+  --font-pixel: var(--font-press-start), monospace;
+  --font-dunggeunmo: var(--font-dunggeunmo), "Malgun Gothic", sans-serif;
+}
+
+body {
+  background: var(--color-dark-bg);
+  color: var(--color-card-white);
+  font-family: var(--font-dunggeunmo);
+}
+
+/* ── Pixel border utility ── */
+.pixel-border {
+  border: 2px solid var(--color-dark-border);
+}
+
+/* ── Pixel shadow on hover ── */
+.pixel-shadow-hover {
+  transition: box-shadow 0.15s ease;
+}
+.pixel-shadow-hover:hover {
+  box-shadow: 4px 4px 0px var(--color-accent-orange);
+}
+
+/* ── Blinking cursor animation ── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
