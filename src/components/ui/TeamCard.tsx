@@ -11,6 +11,10 @@ interface TeamCardProps {
   isEnded?: boolean;
   /** Hackathon list for resolving hackathon title (camp variant) */
   hackathons?: Hackathon[];
+  /** Callback to toggle recruitment open/closed */
+  onToggleRecruit?: (teamId: string) => void;
+  /** Callback to start editing a team */
+  onEdit?: (team: Team) => void;
 }
 
 export default function TeamCard({
@@ -18,15 +22,34 @@ export default function TeamCard({
   variant = 'camp',
   isEnded = false,
   hackathons,
+  onToggleRecruit,
+  onEdit,
 }: TeamCardProps) {
   if (variant === 'detail') {
     return <DetailTeamCard team={team} isEnded={isEnded} />;
   }
 
-  return <CampTeamCard team={team} hackathons={hackathons ?? []} />;
+  return (
+    <CampTeamCard
+      team={team}
+      hackathons={hackathons ?? []}
+      onToggleRecruit={onToggleRecruit}
+      onEdit={onEdit}
+    />
+  );
 }
 
-function CampTeamCard({ team, hackathons }: { team: Team; hackathons: Hackathon[] }) {
+function CampTeamCard({
+  team,
+  hackathons,
+  onToggleRecruit,
+  onEdit,
+}: {
+  team: Team;
+  hackathons: Hackathon[];
+  onToggleRecruit?: (teamId: string) => void;
+  onEdit?: (team: Team) => void;
+}) {
   const hackathon = hackathons.find(item => item.slug === team.hackathonSlug);
   const hasContact = team.isOpen && isValidPublicContactUrl(team.contactUrl);
 
@@ -66,9 +89,34 @@ function CampTeamCard({ team, hackathons }: { team: Team; hackathons: Hackathon[
         </div>
       )}
 
-      <div className="mt-auto flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <span className="font-dunggeunmo text-xs text-card-white/50">{team.memberCount}명</span>
-        <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
+      <div className="mt-auto flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="font-dunggeunmo text-xs text-card-white/50">{team.memberCount}명</span>
+          <div className="flex flex-wrap items-center gap-2">
+            {onEdit && (
+              <button
+                onClick={() => onEdit(team)}
+                className="min-h-8 border border-card-white/20 bg-card-white/5 px-2 py-1 font-pixel text-[8px] text-card-white/60 transition-colors hover:border-accent-yellow/50 hover:text-accent-yellow"
+              >
+                수정
+              </button>
+            )}
+            {onToggleRecruit && (
+              <button
+                onClick={() => onToggleRecruit(team.id)}
+                className={`min-h-8 border px-2 py-1 font-pixel text-[8px] transition-colors ${
+                  team.isOpen
+                    ? 'border-accent-pink/40 bg-accent-pink/10 text-accent-pink hover:bg-accent-pink/20'
+                    : 'border-accent-mint/40 bg-accent-mint/10 text-accent-mint hover:bg-accent-mint/20'
+                }`}
+              >
+                {team.isOpen ? '모집 마감' : '모집 재개'}
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <PixelButton
             href={`/war-room/${team.id}`}
             variant="ghost"

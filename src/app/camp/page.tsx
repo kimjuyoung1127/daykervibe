@@ -33,6 +33,7 @@ function CampPageContent() {
   const [formHackathon, setFormHackathon] = useState('');
   const [formLookingFor, setFormLookingFor] = useState('');
   const [formContact, setFormContact] = useState('');
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
   const filter = searchParams.get('hackathon')?.trim() || 'all';
 
   useEffect(() => {
@@ -79,10 +80,41 @@ function CampPageContent() {
     router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
   }
 
+  function resetForm() {
+    setFormName('');
+    setFormIntro('');
+    setFormHackathon('');
+    setFormLookingFor('');
+    setFormContact('');
+    setEditingTeamId(null);
+    setShowForm(false);
+  }
+
   function handleCreate() {
     if (!formName.trim()) return;
 
     const currentTeams = teams ?? [];
+
+    if (editingTeamId) {
+      const updatedTeams = currentTeams.map(t =>
+        t.id === editingTeamId
+          ? {
+              ...t,
+              name: formName.trim(),
+              intro: formIntro.trim(),
+              hackathonSlug: formHackathon || undefined,
+              lookingFor: formLookingFor.split(',').map(r => r.trim()).filter(Boolean),
+              contactUrl: formContact.trim() || undefined,
+              updatedAt: new Date().toISOString(),
+            }
+          : t,
+      );
+      setTeams(updatedTeams);
+      setItem(STORAGE_KEYS.TEAMS, updatedTeams);
+      resetForm();
+      return;
+    }
+
     const newTeam: Team = {
       id: `T-${Date.now()}`,
       hackathonSlug: formHackathon || undefined,
@@ -101,13 +133,26 @@ function CampPageContent() {
     const updatedTeams = [...currentTeams, newTeam];
     setTeams(updatedTeams);
     setItem(STORAGE_KEYS.TEAMS, updatedTeams);
+    resetForm();
+  }
 
-    setFormName('');
-    setFormIntro('');
-    setFormHackathon('');
-    setFormLookingFor('');
-    setFormContact('');
-    setShowForm(false);
+  function handleToggleRecruit(teamId: string) {
+    const currentTeams = teams ?? [];
+    const updatedTeams = currentTeams.map(t =>
+      t.id === teamId ? { ...t, isOpen: !t.isOpen, updatedAt: new Date().toISOString() } : t,
+    );
+    setTeams(updatedTeams);
+    setItem(STORAGE_KEYS.TEAMS, updatedTeams);
+  }
+
+  function handleStartEdit(team: Team) {
+    setEditingTeamId(team.id);
+    setFormName(team.name);
+    setFormIntro(team.intro ?? '');
+    setFormHackathon(team.hackathonSlug ?? '');
+    setFormLookingFor(team.lookingFor.join(', '));
+    setFormContact(team.contactUrl ?? '');
+    setShowForm(true);
   }
 
   return (
@@ -126,11 +171,14 @@ function CampPageContent() {
         </div>
         <PixelButton
           onClick={() => {
-            if (!showForm && filter !== 'all' && !formHackathon) {
-              setFormHackathon(filter);
+            if (showForm) {
+              resetForm();
+            } else {
+              if (filter !== 'all' && !formHackathon) {
+                setFormHackathon(filter);
+              }
+              setShowForm(true);
             }
-
-            setShowForm(!showForm);
           }}
           className="min-h-10"
         >
@@ -149,7 +197,9 @@ function CampPageContent() {
 
       {showForm && (
         <Card hover={false} variant="dark" className="mb-6">
-          <h2 className="mb-4 font-pixel text-[10px] text-accent-yellow">NEW EXPEDITION</h2>
+          <h2 className="mb-4 font-pixel text-[10px] text-accent-yellow">
+            {editingTeamId ? 'EDIT EXPEDITION' : 'NEW EXPEDITION'}
+          </h2>
           <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="mb-1 block font-dunggeunmo text-xs text-card-white/70">
@@ -212,7 +262,9 @@ function CampPageContent() {
               />
             </div>
           </div>
-          <PixelButton onClick={handleCreate}>원정대 생성</PixelButton>
+          <PixelButton onClick={handleCreate}>
+            {editingTeamId ? '수정 완료' : '원정대 생성'}
+          </PixelButton>
         </Card>
       )}
 
@@ -274,7 +326,7 @@ function CampPageContent() {
               </h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {openTeams.map(team => (
-                  <TeamCard key={team.id} team={team} hackathons={hackathons} />
+                  <TeamCard key={team.id} team={team} hackathons={hackathons} onToggleRecruit={handleToggleRecruit} onEdit={handleStartEdit} />
                 ))}
               </div>
             </div>
@@ -286,7 +338,7 @@ function CampPageContent() {
               </h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {closedTeams.map(team => (
-                  <TeamCard key={team.id} team={team} hackathons={hackathons} />
+                  <TeamCard key={team.id} team={team} hackathons={hackathons} onToggleRecruit={handleToggleRecruit} onEdit={handleStartEdit} />
                 ))}
               </div>
             </div>

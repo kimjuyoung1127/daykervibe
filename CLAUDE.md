@@ -47,3 +47,5 @@
 - `.claude/automations/code-doc-align.prompt.md`
 - `.claude/automations/architecture-diagrams-sync.prompt.md`
 - `.claude/automations/automation-health-monitor.prompt.md`
+- `.claude/automations/code-quality-guard.prompt.md`
+- `.claude/automations/security-boundary-check.prompt.md`

@@ -68,6 +68,42 @@ Scope: document-to-product cross-check, remaining feature decisions, missing sub
 - [ ] Consider team/invite status summary UI only if it is needed for judging clarity.
 - [ ] Consider NoticeBanner/SystemNotice UI only if it supports judging or handoff clarity.
 
+## Phase F - SSOT Feature Coverage
+
+Gap analysis date: 2026-03-10. Source: PRD, Wireframe, Schema, Handover 전수 비교.
+
+### F-1. Must-Have (필수 누락)
+
+- [ ] **SummaryBar viewCount**: Wireframe 4.3 "조회수" 항목 추가 (`SummaryBar.tsx`)
+- [ ] **SummaryBar 기간**: Wireframe 4.3 "기간" 시작~종료 표시 (`SummaryBar.tsx`)
+- [ ] **홈 랭킹 프리뷰**: Wireframe 4.1 Rankings Preview 섹션 (`page.tsx`)
+- [ ] **홈 운영 품질 증거**: Wireframe 4.1 SSOT/PRD/Schema/Workflow + 자동화 프로세스 카드 (`page.tsx`)
+- [ ] **Camp 모집 마감**: Handover "지원 기능: 모집 마감 처리" — isOpen 토글 (`camp/page.tsx`, `TeamCard.tsx`)
+- [ ] **Camp 팀 수정**: Handover "지원 기능: 수정" — 기존 값 채워 수정 (`camp/page.tsx`, `TeamCard.tsx`)
+
+### F-2. Automation Reinforcement (자동화 강화)
+
+- [x] `code-quality-guard.prompt.md` 추가: 코드↔문서 정합성 검증 (라우트 수, 타입 커버리지, 미사용 키, privacy 필드)
+- [x] `security-boundary-check.prompt.md` 추가: 보안 경계 검증 (team-local 격리, URL 주입, 크리덴셜 스캔)
+- [x] `CLAUDE.md` Automation Index 업데이트 (4→6개)
+- [x] `automations/CLAUDE.md` 프롬프트 테이블 업데이트
+
+### F-3. Optional (선택 확장 — PRD/Handover "선택" 명시)
+
+- [ ] 팀 초대/수락/거절 (PRD 5.3 "선택 확장", TeamInvite 타입 완비)
+- [ ] 해커톤 태그 필터 (Handover "옵션: 태그 필터")
+- [ ] 팀 구성 유의사항 팝업 (Handover "유의사항 팝업", Modal 컴포넌트 존재)
+- [ ] 채팅/쪽지 (Handover "옵션", PRD Non-goal "실시간 채팅 SaaS" — 범위 제한 필요)
+
+### F-4. Intentional Exclusions (의도적 제외 — SSOT 근거)
+
+- [x] 관리자 백오피스 — PRD Non-goal
+- [x] 외부 DB — PRD Non-goal, localStorage 우선
+- [x] 실시간 채팅 SaaS — PRD Non-goal
+- [x] 베이스캠프 별도 라우트 — PRD "작전실 상단 요약"
+- [x] 팀 삭제 — Wireframe/Handover "수정, 모집 마감"만 명시
+- [x] 미사용 스키마 UI (TeamInvite, SystemNotice) — 선택 확장 범위, 현재 빈 배열 시드
+
 ## Execution Order
 
 1. Document integrity
@@ -76,6 +112,7 @@ Scope: document-to-product cross-check, remaining feature decisions, missing sub
 4. Missing submission assets
 5. Optional reviewer-facing polish
 6. Final manual desktop drag + phone pass
+7. **SSOT feature coverage (Phase F)**
 
 ## Success Condition
 
@@ -84,3 +121,5 @@ Scope: document-to-product cross-check, remaining feature decisions, missing sub
 - War-room supports actual workflow-card movement.
 - Privacy rules are verified with evidence.
 - Deployment, manual QA, and submission packaging assets are all present.
+- **All must-have SSOT features are implemented and verified.**
+- **6 automations cover document, code quality, and security boundary checks.**
