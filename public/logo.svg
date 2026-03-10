@@ -1,0 +1,24 @@
+<svg width="400" height="120" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="120" fill="#ffffff" />
+
+  <g transform="translate(10, 10)">
+    <rect x="10" y="20" width="5" height="90" fill="#000000" stroke="#000000" stroke-width="1.5"/>
+    <rect x="15" y="20" width="60" height="40" fill="#007BFF" stroke="#000000" stroke-width="1.5"/>
+    <g transform="translate(25, 30)" fill="#ffffff">
+      <rect x="0" y="0" width="10" height="5"/>
+      <rect x="0" y="10" width="8" height="5"/>
+      <rect x="0" y="20" width="10" height="5"/>
+      <rect x="0" y="0" width="5" height="25"/>
+    </g>
+  </g>
+
+  <g transform="translate(90, 15)">
+    <text x="0" y="55" font-family="'Courier New', Courier, monospace" font-size="36" font-weight="bold" fill="#000000">EXPEDITIONHUB</text>
+    <text x="2" y="80" font-family="'Courier New', Courier, monospace" font-size="14" font-weight="normal" fill="#007BFF">HACKATHON OPERATION ROOM</text>
+  </g>
+
+  <pattern id="pixelGrid" width="4" height="4" patternUnits="userSpaceOnUse">
+    <rect width="4" height="4" fill="none" stroke="#000000" stroke-width="0.1" stroke-opacity="0.05"/>
+  </pattern>
+  <rect width="100%" height="100%" fill="url(#pixelGrid)" pointer-events="none"/>
+</svg>
