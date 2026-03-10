@@ -160,6 +160,22 @@ Product: `Expedition Hub`
   - `npm run lint` passed
   - `npm run build` passed
 
+## 2026-03-10 Addendum - SSOT Gap Features & Automation Reinforcement
+
+- SSOT 전수 비교(PRD, Wireframe, Schema, Handover)로 누락 기능 6개 식별 후 전수 구현 완료.
+- 구현 항목:
+  1. **SummaryBar 5항목 완성** — viewCount(조회수) + 기간(start~end) 추가. Wireframe 4.3 "상태, 기간, 팀 수, 조회수, 총상금" 정합.
+  2. **홈 랭킹 프리뷰** — Wireframe 4.1 "Rankings Preview" 섹션. localStorage에서 전체 기간 상위 5명 렌더링.
+  3. **홈 운영 품질 증거** — Wireframe 4.1 "운영 품질 증거" 섹션. SSOT 문서 4개 + 자동화 프로세스 6개 카드 그리드.
+  4. **Camp 모집 마감 토글** — Handover "지원 기능: 모집 마감 처리". `isOpen` 토글 버튼으로 모집/마감 전환.
+  5. **Camp 팀 수정** — Handover "지원 기능: 수정". 기존 값을 폼에 채워 수정 후 localStorage 저장.
+  6. **자동화 강화 (4→6개)** — `code-quality-guard.prompt.md` (코드↔문서 정합성), `security-boundary-check.prompt.md` (보안 경계 검증) 추가.
+- 영향받은 파일: `SummaryBar.tsx`, `page.tsx`, `camp/page.tsx`, `TeamCard.tsx`, `.claude/automations/*`, `CLAUDE.md`, `CROSS-CHECK-CHECKLIST.md`
+- Phase F 체크리스트 전항 완료. 선택 확장 4개(팀 초대, 태그 필터, 유의사항 팝업, 채팅)는 미구현.
+- Validation:
+  - `npm run lint` passed
+  - `npm run build` passed
+
 ## Current Phase
 **Phase 2: QA + 확장 — IN PROGRESS**
 
@@ -174,11 +190,11 @@ Product: `Expedition Hub`
 ## Completed Deliverables
 - `src/components/ui/*` — Card, StatusBadge, PixelButton, Modal, TeamCard, Loading/Empty/Error 상태 UI
 - `src/components/layout/*` — TopNav, Footer, PageShell
-- `src/app/page.tsx` — 랜딩, 주요 CTA, featured hackathon, 포털 가치 섹션
+- `src/app/page.tsx` — 랜딩, 주요 CTA, featured hackathon, 포털 가치 섹션, 랭킹 프리뷰, 운영 품질 증거 섹션
 - `src/app/hackathons/page.tsx` — 해커톤 목록, 상태 필터, 카드 그리드
 - `src/app/hackathons/[slug]/page.tsx` — 요약 바, 섹션 탭, 필수 8개 상세 섹션
 - `src/components/hackathon/sections/*` — overview / guide / eval / schedule / prize / teams / submit / leaderboard
-- `src/app/camp/page.tsx` — 원정대 모집 필터, `?hackathon=:slug` query flow, 생성 폼, 모집 상태 카드, 작전실 열기 CTA
+- `src/app/camp/page.tsx` — 원정대 모집 필터, `?hackathon=:slug` query flow, 생성/수정 폼, 모집 마감 토글, 모집 상태 카드, 작전실 열기 CTA
 - `src/app/rankings/page.tsx` — 기간 기반 글로벌 랭킹 테이블
 - `src/app/war-room/[teamId]/page.tsx` — 베이스캠프 요약, 단계 관리, 제출 준비 허브
 - `src/components/hackathon/sections/TeamsSection.tsx` — 상세 팀 카드와 작전실 이동 CTA, `/camp?hackathon=:slug` deep link
@@ -220,10 +236,11 @@ Product: `Expedition Hub`
 
 ## Next Actions
 1. ~~확장성 개선 구현~~ — **완료** (SSOT 준수 5개 구현, 2개 SSOT 위반으로 제외)
-2. Run one manual phone pass for soft-keyboard compression, final contrast, and touch comfort.
-3. Do one focused browser pass for the stricter public submit handoff flow.
-4. Finalize Submission 1 copy and remaining delivery planning docs.
-5. Prepare Vercel deployment evidence and PDF packaging assets once the product is frozen.
+2. ~~SSOT 갭 기능 구현~~ — **완료** (필수 6개 전수 구현, 자동화 4→6개 강화)
+3. Run one manual phone pass for soft-keyboard compression, final contrast, and touch comfort.
+4. Do one focused browser pass for the stricter public submit handoff flow.
+5. Finalize Submission 1 copy and remaining delivery planning docs.
+6. Prepare Vercel deployment evidence and PDF packaging assets once the product is frozen.
 
 ## Recent Decisions
 - 제품 서비스명은 `Expedition Hub`

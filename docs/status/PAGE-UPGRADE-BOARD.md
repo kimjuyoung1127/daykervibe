@@ -77,6 +77,23 @@ Source of truth for route-level execution status.
   - 팀 삭제: Wireframe/Handover가 "수정, 모집 마감 처리"만 명시
   - 랭킹 모달: Schema에 추가 데이터 없음
 
+## 2026-03-10 Addendum - SSOT Gap Features & Automation Reinforcement
+
+- `/`
+  - Rankings Preview 섹션 추가: localStorage에서 전체 기간 상위 5명 미니 테이블 렌더링
+  - Operations Quality Evidence 섹션 추가: SSOT 문서 4개(PRD, Schema, Wireframe, Architecture) + 자동화 6개 카드 그리드
+- `/hackathons/:slug`
+  - SummaryBar 5항목 완성: STATUS, 기간(start~end), TEAMS, 조회수(viewCount), PRIZE
+  - 기존 D-DAY를 기간 표시로 교체, 그리드 `sm:grid-cols-3 lg:grid-cols-5` 반응형
+- `/camp`
+  - 팀 수정 기능 추가: TeamCard에 "수정" 버튼 → 폼에 기존 값 채움 → 수정 완료 저장
+  - 모집 마감 토글 추가: TeamCard에 "모집 마감"/"모집 재개" 버튼 → `isOpen` 토글 + localStorage 저장
+  - 수정 모드시 폼 제목 "EDIT EXPEDITION", 버튼 "수정 완료"로 전환
+- 자동화 레이어
+  - `code-quality-guard.prompt.md` 추가 (코드↔문서 정합성: 라우트 수, 타입 커버리지, privacy 필드)
+  - `security-boundary-check.prompt.md` 추가 (보안 경계: team-local 격리, URL 주입, 크리덴셜 스캔)
+  - 자동화 총 6개 (기존 4 + 신규 2)
+
 ## 2026-03-10 Addendum - SSOT Strict Alignment
 
 - `/hackathons/:slug`

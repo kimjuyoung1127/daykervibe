@@ -82,9 +82,23 @@ Result: pass with follow-up items
   - 팀 삭제 → Wireframe/Handover "수정, 모집 마감 처리"만 명시
   - 랭킹 모달 → Schema 추가 데이터 없음, Wireframe 테이블 형식만 명시
 
+## 2026-03-10 Addendum - SSOT Gap Coverage & Automation
+
+- SSOT 전수 비교(PRD, Wireframe, Schema, Handover) 완료. 필수 누락 6개 모두 구현.
+- SummaryBar: Wireframe 4.3 요구 5항목(상태, 기간, 팀 수, 조회수, 총상금) 완전 정합.
+- 홈페이지: Rankings Preview + Operations Quality Evidence 두 섹션 추가 (Wireframe 4.1 정합).
+- Camp: 팀 수정 + 모집 마감 토글 구현 (Handover "지원 기능: 수정, 모집 마감 처리" 정합).
+- 자동화 레이어 강화 (4→6개):
+  - 신규: `code-quality-guard.prompt.md`, `security-boundary-check.prompt.md`
+  - 총 6개 자동화가 문서, 코드 품질, 보안 경계를 커버
+- CROSS-CHECK-CHECKLIST Phase F-1 전항 완료.
+- 선택 확장 4개(팀 초대, 태그 필터, 유의사항 팝업, 채팅)는 PRD/Handover "선택" → 미구현 유지.
+
 ## Integrity Verdict
 
 - The repo is no longer in a bootstrap-only state.
 - The main integrity risk is not missing implementation coverage, but final submission packaging and non-emulated real-device QA.
 - Asset delivery is now aligned: no orphan files, no ghost references, no hardcoded common banners.
 - Component layer is now centralized: shared Modal, TeamCard, and format utilities reduce duplication and improve maintainability.
+- **SSOT feature gap is now closed**: all must-have features from PRD/Wireframe/Schema/Handover are implemented.
+- **6 automations** cover document integrity, code quality, and security boundary verification.
