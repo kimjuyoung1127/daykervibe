@@ -1,3 +1,4 @@
+import { formatDateTime, formatPrize } from '@/lib/format';
 import type {
   Hackathon,
   HackathonSection,
@@ -27,23 +28,6 @@ type SourceLimitedContent = {
   allowedArtifactTypes?: string[];
   sourceLimited?: boolean;
 };
-
-function formatDateTime(iso?: string): string {
-  if (!iso) return '미공개';
-
-  return new Date(iso).toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function formatPrize(krw: number): string {
-  if (krw >= 10000) return `${(krw / 10000).toLocaleString()}만원`;
-  return `${krw.toLocaleString()}원`;
-}
 
 export function getDisplayHackathonStatus(
   status: HackathonStatus,

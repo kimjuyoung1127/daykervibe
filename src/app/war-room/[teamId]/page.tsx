@@ -810,6 +810,40 @@ export default function WarRoomPage() {
           )}
         </div>
       </div>
+
+      {members.length > 0 && (
+        <div className="mb-6">
+          <h2 className="mb-3 font-pixel text-[10px] text-card-white/50">TEAM MEMBERS</h2>
+          <div className="border-2 border-dark-border p-3">
+            <div className="space-y-2">
+              {members.map(member => (
+                <div
+                  key={member.id}
+                  className="flex min-h-10 items-center gap-3 bg-card-white/5 px-3 py-2"
+                >
+                  <span className="font-dunggeunmo text-sm text-card-white">
+                    {member.displayName}
+                  </span>
+                  {member.roleLabel && (
+                    <span className="border border-accent-purple/40 bg-accent-purple/18 px-2 py-0.5 font-pixel text-[8px] text-accent-purple">
+                      {member.roleLabel}
+                    </span>
+                  )}
+                  <span
+                    className={`ml-auto font-pixel text-[8px] ${
+                      member.status === 'active'
+                        ? 'text-accent-mint'
+                        : 'text-accent-yellow'
+                    }`}
+                  >
+                    {member.status === 'active' ? 'ACTIVE' : 'PENDING'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </PageShell>
   );
 }

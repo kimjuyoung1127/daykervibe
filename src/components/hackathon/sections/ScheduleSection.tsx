@@ -1,19 +1,11 @@
+import { formatDateTime } from '@/lib/format';
+
 interface ScheduleData {
   timezone?: string;
   milestones?: {
     name: string;
     at: string;
   }[];
-}
-
-function formatDatetime(iso: string): string {
-  return new Date(iso).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 }
 
 function isPast(iso: string): boolean {
@@ -53,7 +45,7 @@ export default function ScheduleSection({ content }: { content: string }) {
                 {m.name}
               </p>
               <p className="font-pixel text-[8px] text-card-white/40 mt-0.5">
-                {formatDatetime(m.at)}
+                {formatDateTime(m.at)}
               </p>
             </div>
           </div>
