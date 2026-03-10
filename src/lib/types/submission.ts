@@ -1,29 +1,28 @@
-/** Submission artifact status */
+/** @visibility public (notes is team-local) */
 export type SubmissionStatus = 'empty' | 'draft' | 'submitted';
 
-/** Submission artifact kind */
+/** @visibility team-local */
 export type ArtifactKind = 'plan_url' | 'web_url' | 'github_url' | 'pdf_url';
 
-/**
- * Submission tracking entity
- * @visibility public (except notes: team-local)
- */
 export interface Submission {
   id: string;
+  /** @visibility public */
   hackathonSlug: string;
+  /** @visibility public */
   teamId?: string;
+  /** @visibility public */
   planStatus: SubmissionStatus;
+  /** @visibility public */
   webStatus: SubmissionStatus;
+  /** @visibility public */
   pdfStatus: SubmissionStatus;
   /** @visibility team-local */
   notes?: string;
+  /** @visibility public */
   submittedAt?: string;
 }
 
-/**
- * Submission artifact URL reference
- * @visibility team-local
- */
+/** @visibility team-local */
 export interface SubmissionArtifact {
   id: string;
   submissionId: string;

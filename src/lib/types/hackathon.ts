@@ -1,21 +1,24 @@
-/** Hackathon status enum */
+/** @visibility public */
 export type HackathonStatus = 'upcoming' | 'ongoing' | 'ended';
 
-/** Section types matching 8 required detail tabs */
+/** @visibility public */
 export type HackathonSectionType =
-  | 'overview'
-  | 'guide'
-  | 'eval'
-  | 'schedule'
-  | 'prize'
-  | 'teams'
-  | 'submit'
-  | 'leaderboard';
+  | 'overview' | 'guide' | 'eval' | 'schedule'
+  | 'prize' | 'teams' | 'submit' | 'leaderboard';
 
-/**
- * Core hackathon entity
- * @visibility public
- */
+/** @visibility public */
+export interface HackathonSection {
+  id: string;
+  hackathonSlug: string;
+  type: HackathonSectionType;
+  title: string;
+  /** JSON-stringified or markdown content */
+  content: string;
+  displayOrder: number;
+  isRequired: boolean;
+}
+
+/** @visibility public */
 export interface Hackathon {
   id: string;
   slug: string;
@@ -32,18 +35,4 @@ export interface Hackathon {
   prizeTotalKRW: number;
   thumbnailUrl?: string;
   sections: HackathonSection[];
-}
-
-/**
- * Detail section within a hackathon (8 types)
- * @visibility public
- */
-export interface HackathonSection {
-  id: string;
-  hackathonSlug: string;
-  type: HackathonSectionType;
-  title: string;
-  content: string;
-  displayOrder: number;
-  isRequired: boolean;
 }

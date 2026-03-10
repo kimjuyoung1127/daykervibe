@@ -1,13 +1,4 @@
-/** Team member status */
-export type TeamMemberStatus = 'active' | 'pending';
-
-/** Team invite status */
-export type TeamInviteStatus = 'sent' | 'accepted' | 'rejected';
-
-/**
- * Expedition team (원정대)
- * @visibility public (except ownerLabel: private-hidden, updatedAt: team-local)
- */
+/** @visibility public (ownerLabel is private-hidden) */
 export interface Team {
   id: string;
   hackathonSlug?: string;
@@ -17,17 +8,17 @@ export interface Team {
   lookingFor: string[];
   contactUrl: string;
   memberCount: number;
-  /** @visibility private-hidden — never render in UI */
+  /** @visibility private-hidden — never render */
   ownerLabel?: string;
   createdAt: string;
   /** @visibility team-local */
   updatedAt?: string;
 }
 
-/**
- * Team member
- * @visibility team-local
- */
+/** @visibility team-local */
+export type TeamMemberStatus = 'active' | 'pending';
+
+/** @visibility team-local */
 export interface TeamMember {
   id: string;
   teamId: string;
@@ -38,10 +29,10 @@ export interface TeamMember {
   isPrivateProfile: boolean;
 }
 
-/**
- * Team invitation
- * @visibility team-local
- */
+/** @visibility team-local */
+export type TeamInviteStatus = 'sent' | 'accepted' | 'rejected';
+
+/** @visibility team-local */
 export interface TeamInvite {
   id: string;
   teamId: string;

@@ -1,16 +1,13 @@
-/** Submission preparation stages */
+/** @visibility team-local */
 export type SubmissionStage = 'teaming' | 'plan' | 'web' | 'pdf' | 'done';
 
-/** Workflow board columns */
+/** @visibility team-local */
 export type WorkflowColumn = 'plan' | 'web' | 'pdf' | 'submitted';
 
-/** Checklist item status */
+/** @visibility team-local */
 export type ChecklistStatus = 'todo' | 'doing' | 'done';
 
-/**
- * War Room — 제출 준비 관리 허브 (NOT a collaboration tool)
- * @visibility team-local
- */
+/** @visibility team-local */
 export interface WarRoom {
   id: string;
   teamId: string;
@@ -22,10 +19,7 @@ export interface WarRoom {
   notes?: string;
 }
 
-/**
- * Kanban-style workflow card in war room
- * @visibility team-local
- */
+/** @visibility team-local */
 export interface WarRoomWorkflowCard {
   id: string;
   warRoomId: string;
@@ -38,10 +32,7 @@ export interface WarRoomWorkflowCard {
   isBlocked: boolean;
 }
 
-/**
- * Checklist item in war room
- * @visibility team-local
- */
+/** @visibility team-local */
 export interface WarRoomChecklistItem {
   id: string;
   warRoomId: string;

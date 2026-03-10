@@ -1,15 +1,15 @@
 export type {
   Hackathon,
-  HackathonSection,
   HackathonStatus,
+  HackathonSection,
   HackathonSectionType,
 } from './hackathon';
 
 export type {
   Team,
   TeamMember,
-  TeamInvite,
   TeamMemberStatus,
+  TeamInvite,
   TeamInviteStatus,
 } from './team';
 
@@ -29,12 +29,6 @@ export type {
   ArtifactKind,
 } from './submission';
 
-export type {
-  LeaderboardEntry,
-  LeaderboardSubjectType,
-  LeaderboardStatus,
-} from './leaderboard';
-
-export type { RankingProfile, RankingPeriod } from './ranking';
-
+export type { LeaderboardEntry } from './leaderboard';
+export type { RankingProfile } from './ranking';
 export type { SystemNotice, NoticeScope, NoticeLevel } from './system';

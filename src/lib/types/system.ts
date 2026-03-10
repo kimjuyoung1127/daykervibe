@@ -1,13 +1,10 @@
-/** Notice scope */
+/** @visibility public */
 export type NoticeScope = 'global' | 'hackathon' | 'team';
 
-/** Notice severity level */
+/** @visibility public */
 export type NoticeLevel = 'info' | 'warning' | 'error';
 
-/**
- * System-wide notice/alert
- * @visibility public
- */
+/** @visibility public */
 export interface SystemNotice {
   id: string;
   scope: NoticeScope;

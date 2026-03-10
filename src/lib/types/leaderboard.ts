@@ -1,21 +1,12 @@
-/** Leaderboard subject type */
-export type LeaderboardSubjectType = 'team' | 'user';
-
-/** Leaderboard entry status */
-export type LeaderboardStatus = 'ranked' | 'not_submitted';
-
-/**
- * Leaderboard entry for a hackathon
- * @visibility public
- */
+/** @visibility public */
 export interface LeaderboardEntry {
   id: string;
   hackathonSlug: string;
-  subjectType: LeaderboardSubjectType;
+  subjectType: 'team' | 'user';
   subjectId: string;
   name: string;
   rank?: number;
   score: number;
-  status: LeaderboardStatus;
+  status: 'ranked' | 'not_submitted';
   scoreBreakdown?: Record<string, number>;
 }

@@ -1,7 +1,3 @@
-/**
- * localStorage key constants — prefixed with expeditionHub.*
- * Matches schema.md "Local Storage Keys" section exactly.
- */
 export const STORAGE_KEYS = {
   HACKATHONS: 'expeditionHub.hackathons',
   TEAMS: 'expeditionHub.teams',
@@ -17,7 +13,4 @@ export const STORAGE_KEYS = {
   SYSTEM_NOTICES: 'expeditionHub.systemNotices',
 } as const;
 
-/** Seeding flag to prevent duplicate seeding */
 export const SEEDED_FLAG = 'expeditionHub.__seeded';
-
-export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
