@@ -26,9 +26,9 @@ export interface Hackathon {
   status: HackathonStatus;
   summary: string;
   tags: string[];
-  eventStartAt: string;
+  eventStartAt?: string;
   eventEndAt: string;
-  registrationStartAt: string;
+  registrationStartAt?: string;
   registrationEndAt: string;
   teamCount?: number;
   viewCount?: number;

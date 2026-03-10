@@ -8,6 +8,7 @@ export const STORAGE_KEYS = {
   WAR_ROOM_CHECKLIST: 'expeditionHub.warRoomChecklist',
   SUBMISSIONS: 'expeditionHub.submissions',
   SUBMISSION_ARTIFACTS: 'expeditionHub.submissionArtifacts',
+  PENDING_SUBMIT_DRAFTS: 'expeditionHub.pendingSubmitDrafts',
   LEADERBOARDS: 'expeditionHub.leaderboards',
   RANKINGS: 'expeditionHub.rankings',
   SYSTEM_NOTICES: 'expeditionHub.systemNotices',

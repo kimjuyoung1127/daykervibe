@@ -1,6 +1,12 @@
-import type { Hackathon, HackathonSection, HackathonSectionType, Team, LeaderboardEntry } from '@/lib/types';
-
-/* ── Raw JSON shapes ── */
+import { isValidPublicContactUrl } from '@/lib/contact-links';
+import { getDisplayHackathonStatus } from '@/lib/hackathon-detail';
+import type {
+  Hackathon,
+  HackathonSection,
+  HackathonSectionType,
+  LeaderboardEntry,
+  Team,
+} from '@/lib/types';
 
 interface RawHackathon {
   slug: string;
@@ -55,8 +61,6 @@ interface RawLeaderboard {
   extraLeaderboards?: RawLeaderboard[];
 }
 
-/* ── Helpers ── */
-
 const SECTION_TYPE_MAP: Record<string, HackathonSectionType> = {
   overview: 'overview',
   info: 'guide',
@@ -85,63 +89,63 @@ function buildSections(slug: string, raw: RawDetailSections): HackathonSection[]
 function sumPrize(sections: RawDetailSections): number {
   const prize = sections.prize as { items?: { amountKRW: number }[] } | undefined;
   if (!prize?.items) return 0;
-  return prize.items.reduce((sum, i) => sum + i.amountKRW, 0);
+  return prize.items.reduce((sum, item) => sum + item.amountKRW, 0);
 }
 
 function extractSummary(sections: RawDetailSections): string {
-  const ov = sections.overview as { summary?: string } | undefined;
-  return ov?.summary ?? '';
+  const overview = sections.overview as { summary?: string } | undefined;
+  return overview?.summary ?? '';
 }
 
-function extractFirstMilestone(sections: RawDetailSections): string {
-  const sched = sections.schedule as { milestones?: { at: string }[] } | undefined;
-  return sched?.milestones?.[0]?.at ?? new Date().toISOString();
+function extractFirstMilestone(sections: RawDetailSections): string | undefined {
+  const schedule = sections.schedule as { milestones?: { at: string }[] } | undefined;
+  return schedule?.milestones?.[0]?.at;
 }
-
-/* ── Public transformers ── */
 
 export function transformHackathons(
   rawList: RawHackathon[],
   rawDetail: RawDetail,
 ): Hackathon[] {
-  // Collect all details (primary + extras)
   const allDetails: RawDetail[] = [rawDetail, ...(rawDetail.extraDetails ?? [])];
-  const detailMap = new Map(allDetails.map(d => [d.slug, d]));
+  const detailMap = new Map(allDetails.map(detail => [detail.slug, detail]));
 
-  return rawList.map(h => {
-    const detail = detailMap.get(h.slug);
+  return rawList.map(hackathon => {
+    const detail = detailMap.get(hackathon.slug);
     const sections = detail?.sections ?? {};
     const eventStartAt = extractFirstMilestone(sections);
 
     return {
-      id: h.slug,
-      slug: h.slug,
-      title: h.title,
-      status: h.status as Hackathon['status'],
+      id: hackathon.slug,
+      slug: hackathon.slug,
+      title: hackathon.title,
+      status: getDisplayHackathonStatus(
+        hackathon.status as Hackathon['status'],
+        hackathon.period.endAt,
+      ),
       summary: extractSummary(sections),
-      tags: h.tags,
-      thumbnailUrl: h.thumbnailUrl,
+      tags: hackathon.tags,
+      thumbnailUrl: hackathon.thumbnailUrl,
       eventStartAt,
-      eventEndAt: h.period.endAt,
+      eventEndAt: hackathon.period.endAt,
       registrationStartAt: eventStartAt,
-      registrationEndAt: h.period.submissionDeadlineAt,
+      registrationEndAt: hackathon.period.submissionDeadlineAt,
       prizeTotalKRW: sumPrize(sections),
-      sections: buildSections(h.slug, sections),
+      sections: buildSections(hackathon.slug, sections),
     };
   });
 }
 
 export function transformTeams(rawTeams: RawTeam[]): Team[] {
-  return rawTeams.map(t => ({
-    id: t.teamCode,
-    hackathonSlug: t.hackathonSlug,
-    name: t.name,
-    intro: t.intro,
-    isOpen: t.isOpen,
-    lookingFor: t.lookingFor,
-    contactUrl: t.contact.url,
-    memberCount: t.memberCount,
-    createdAt: t.createdAt,
+  return rawTeams.map(team => ({
+    id: team.teamCode,
+    hackathonSlug: team.hackathonSlug,
+    name: team.name,
+    intro: team.intro,
+    isOpen: team.isOpen,
+    lookingFor: team.lookingFor,
+    contactUrl: isValidPublicContactUrl(team.contact.url) ? team.contact.url : undefined,
+    memberCount: team.memberCount,
+    createdAt: team.createdAt,
   }));
 }
 
@@ -149,16 +153,16 @@ export function transformLeaderboard(raw: RawLeaderboard): LeaderboardEntry[] {
   const allBoards: RawLeaderboard[] = [raw, ...(raw.extraLeaderboards ?? [])];
 
   return allBoards.flatMap(board =>
-    board.entries.map(e => ({
-      id: `${board.hackathonSlug}-rank-${e.rank}`,
+    board.entries.map(entry => ({
+      id: `${board.hackathonSlug}-rank-${entry.rank}`,
       hackathonSlug: board.hackathonSlug,
       subjectType: 'team' as const,
-      subjectId: e.teamName.toLowerCase().replace(/\s+/g, '-'),
-      name: e.teamName,
-      rank: e.rank,
-      score: e.score,
+      subjectId: entry.teamName.toLowerCase().replace(/\s+/g, '-'),
+      name: entry.teamName,
+      rank: entry.rank,
+      score: entry.score,
       status: 'ranked' as const,
-      scoreBreakdown: e.scoreBreakdown,
+      scoreBreakdown: entry.scoreBreakdown,
     })),
   );
 }

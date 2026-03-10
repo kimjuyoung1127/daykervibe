@@ -1,6 +1,38 @@
 # Expedition Hub Schema
 
-Last updated: 2026-03-09 (KST)
+## 2026-03-10 SSOT Strict Alignment Addendum
+
+- `Team.contactUrl`
+  - changed from effectively required public link to optional public link
+  - invalid placeholder or dead demo links are normalized to `undefined`
+  - public UI must render those cases as `연락처 준비중`, not as a broken external navigation
+- `Hackathon.sections`
+  - the detail route must keep the required 8-section shell even when the bootstrap source lacks a matching detail payload
+  - missing detail is represented as `source-limited`, not as invented facts
+- `PendingSubmitDraft`
+  - visibility: browser-local only
+  - purpose: store minimal submit-panel draft data from the public hackathon detail page
+  - authoritative team submission data still lives in `war-room`, `submissions`, and `submissionArtifacts`
+- `SubmissionArtifact`
+  - remains team-local only
+  - public detail may collect a handoff draft, but it must not directly expose or persist team-local artifact state to public routes
+- `Display status`
+  - when raw source status conflicts with the event end date, UI display status is allowed to resolve the conflict using the date
+
+## 2026-03-10 Self-Review Follow-up Addendum
+
+- `Hackathon.eventStartAt` / `Hackathon.registrationStartAt`
+  - are source-backed optional fields
+  - source-limited detail must never fabricate them from the current timestamp
+  - missing start dates render as `미공개`
+- `PendingSubmitDraft`
+  - text fields advance readiness only when they map to a text stage and have non-empty content
+  - URL fields advance readiness only when they are valid `http/https` values
+  - file-style public submit fields are note-only and do not advance readiness by themselves
+- `SubmissionArtifact`
+  - only valid URL draft values may become team-local artifact links during war-room import
+
+Last updated: 2026-03-10 (KST)
 Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 
 ## Storage Strategy
@@ -23,9 +55,9 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 | `status` | `'upcoming' \| 'ongoing' \| 'ended'` | yes | public | |
 | `summary` | string | yes | public | |
 | `tags` | string[] | yes | public | |
-| `eventStartAt` | string | yes | public | ISO 8601 |
+| `eventStartAt` | string | no | public | ISO 8601, source-backed only |
 | `eventEndAt` | string | yes | public | ISO 8601 |
-| `registrationStartAt` | string | yes | public | ISO 8601 |
+| `registrationStartAt` | string | no | public | ISO 8601, source-backed only |
 | `registrationEndAt` | string | yes | public | ISO 8601 |
 | `teamCount` | number | no | public | fallback 허용 |
 | `viewCount` | number | no | public | fallback 허용 |
@@ -52,7 +84,7 @@ Source: `docs/ref/hackathons/daker-handover-2026-03.md`
 | `intro` | string | yes | public | |
 | `isOpen` | boolean | yes | public | |
 | `lookingFor` | string[] | yes | public | |
-| `contactUrl` | string | yes | public | 공개 가능한 링크만 |
+| `contactUrl` | string | no | public | 공개 가능한 링크만 |
 | `memberCount` | number | yes | public | |
 | `ownerLabel` | string | no | private-hidden | 비노출 원칙 |
 | `createdAt` | string | yes | public | |

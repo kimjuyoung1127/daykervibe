@@ -8,7 +8,7 @@
       "Compression",
       "vLLM"
     ],
-    "thumbnailUrl": "https://example.com/public/img/aimers8.png",
+    "thumbnailUrl": "/Aimers.webp",
     "period": {
       "timezone": "Asia/Seoul",
       "submissionDeadlineAt": "2026-02-25T10:00:00+09:00",
@@ -29,7 +29,7 @@
       "GenAI",
       "Workflow"
     ],
-    "thumbnailUrl": "https://example.com/public/img/vibe202602.png",
+    "thumbnailUrl": "/monthly.webp",
     "period": {
       "timezone": "Asia/Seoul",
       "submissionDeadlineAt": "2026-03-03T10:00:00+09:00",
@@ -51,7 +51,7 @@
       "Vercel",
       "Handover"
     ],
-    "thumbnailUrl": "https://example.com/public/img/daker-handover-202603.png",
+    "thumbnailUrl": "/hacker.png",
     "period": {
       "timezone": "Asia/Seoul",
       "submissionDeadlineAt": "2026-03-30T10:00:00+09:00",

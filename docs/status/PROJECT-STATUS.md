@@ -1,8 +1,123 @@
 # Project Status
 
+## 2026-03-10 Addendum - Asset Cleanup & Detail Banner Policy
+
+- Removed unused public assets after full reference audit:
+  - Deleted: `link.svg`, `banner.png`, `banner.webp`, `og-image.png`, `Aimers.png`, `monthly.png`, `ranking3.png`
+  - Deleted: `design_reference/` directory (8 design PNG files, no code references)
+- Changed detail page banner policy:
+  - `/hackathons/:slug` no longer uses a hardcoded common banner (`/banner.webp`)
+  - Detail hero image now uses each hackathon's `thumbnailUrl` field
+  - If `thumbnailUrl` is absent, the image block is hidden and the page renders as a text header with 8-section layout intact
+- Removed ghost `war-room.svg` background reference from `/war-room/:teamId` (file never existed, was causing silent 404)
+- Current active public assets: `Aimers.webp`, `monthly.webp`, `hacker.png`, `og-image-hero.webp`, `ranking3.webp`, `logo.svg`, `favicon.svg`, `checklist.svg`, `link.svg`→removed, `rocket.svg`, `search.svg`, `team.svg`, `trophy.svg`, `fonts/`
+- Validation:
+  - `npm run lint` passed
+  - `npm run build` passed
+
+## 2026-03-10 Addendum - Asset Loading Optimization
+
+- Reduced first-load image cost without changing the visual font families or requiring new external assets.
+- Added local web-delivery derivatives for the heaviest runtime images:
+  - `public/og-image-hero.webp`
+  - `public/Aimers.webp`
+  - `public/monthly.webp`
+  - `public/ranking3.webp`
+- Home hero uses the dedicated `og-image-hero.webp` with `priority` and explicit `sizes`.
+- Home featured cards and `/hackathons` list cards now render `thumbnailUrl` with responsive `sizes`.
+- Detail and rankings banners use optimized assets without `priority`, reducing competition with initial text render.
+- Converted bundled fonts to web delivery format while keeping the same typefaces:
+  - `PressStart2P.woff2` stays preloaded
+  - `DungGeunMo.woff2` now uses `preload: false`
+- `next.config.ts` images.formats set to `['image/avif', 'image/webp']`
+- Validation:
+  - `npm run lint` passed
+  - `npm run build` passed
+
+## 2026-03-10 Addendum - Self-Review Follow-up Fixes
+
+- Closed the 3 follow-up issues found in self review without weakening SSOT.
+- Source-limited hackathons no longer fabricate missing start dates from the current timestamp.
+- Missing `eventStartAt` / `registrationStartAt` now render as `미공개` instead of synthetic values.
+- Public submit draft import is stricter:
+  - text fields advance only their mapped text stage
+  - URL fields advance readiness only when the value is a valid `http/https` URL
+  - file-style public submit requirements are note-only and do not create fake upload state
+- War-room import now keeps invalid URLs and note-only file prep content in notes only, not in readiness stages or artifact links.
+- Validation:
+  - `npm run lint` passed
+  - `npm run build` passed
+
+## 2026-03-10 Addendum - Ended Hackathon Archive Guard
+
+- Re-checked the monthly source-limited detail flow against SSOT and tightened the public archive behavior.
+- `ended` hackathons now keep `Teams` and `Submit` sections visible as read-only archive context.
+- Ended public detail pages no longer expose:
+  - recruiting actions
+  - `작전실 이동`
+  - `CAMP에서 팀 찾기`
+  - public submit draft actions
+- Validation:
+  - `npm run lint` passed
+  - `npm run build` passed
+
+## 2026-03-10 Addendum - SSOT Strict Alignment
+
+- Implemented strict SSOT alignment for public/team-local boundaries and incomplete source cases.
+- Public contact links now follow a hard guard:
+  - valid public URL -> external contact CTA
+  - placeholder or dead demo URL -> `연락처 준비중`
+- `/hackathons/:slug` now keeps the required 8-section shell even when bootstrap detail is missing.
+- `monthly-vibe-coding-2026-02` now renders as a source-limited detail flow instead of falling back to a generic empty section message.
+- Public `Submit Section` now behaves as a minimal draft handoff panel:
+  - save browser-local draft
+  - move to `/camp?hackathon=:slug` or `/war-room/:teamId`
+  - keep team-local submission authority inside the war-room
+- `/war-room/:teamId` now imports pending public submit drafts and shows a confirmation notice.
+- `WAR ROOM > BASECAMP` white-card summary values were rebalanced to dark readable text with tinted pills instead of low-contrast mint/purple body text.
+- Validation:
+  - `npm run lint` passed
+  - `npm run build` passed
+
 Last Updated: 2026-03-10 (KST)
 Focus Hackathon: `daker-handover-2026-03`
 Product: `Expedition Hub`
+
+## 2026-03-10 Addendum - Manual QA Status
+
+- Desktop pointer drag sanity pass: completed by the operator
+- Real-device phone pass: not completed yet
+- Refreshed stale planning/integrity docs:
+  - `docs/status/INTEGRITY-REPORT.md`
+  - `ai-context/master-plan.md`
+- Remaining practical blockers are now submission packaging and real-device evidence, not route implementation coverage
+
+## 2026-03-10 Addendum - Drag and Privacy
+
+- `/war-room/:teamId` now supports zero-dependency workflow card drag-and-drop across columns and within a column.
+- Narrow mobile keeps the same workflow movement through compact move controls inside each card instead of requiring touch drag.
+- Drag persistence is verified against localStorage by moving cards, reloading, and confirming the new `column` / `order` layout remains.
+- Privacy boundary verification passed for the current public routes:
+  - `/`
+  - `/hackathons`
+  - `/hackathons/daker-handover-2026-03`
+  - `/camp`
+  - `/rankings`
+- Verified public-route non-leaks:
+  - no `ownerLabel`
+  - no `isPrivateProfile`
+  - no checklist / team notes panels
+  - no team-local artifact links
+  - no seeded submission id exposure
+- Verified team-local-only route behavior:
+  - `/war-room/T-HANDOVER-01` shows checklist, notes, team member list, and artifact links as intended
+- Evidence:
+  - `docs/evidence/war-room-drag-and-privacy-verification-2026-03-10.md`
+  - `docs/evidence/responsive-qa-phase2-playwright-2026-03-10.md`
+- Remaining Phase 2 work:
+  1. Run one manual phone pass for soft-keyboard compression, contrast, and touch comfort
+  2. Finalize Submission 1 copy and align any remaining stale planning docs
+  3. Prepare deployment evidence and PDF packaging assets once the product is frozen
 
 ## Current Phase
 **Phase 2: QA + 확장 — IN PROGRESS**
@@ -33,6 +148,9 @@ Product: `Expedition Hub`
 - `npm run build` 통과
 - `npm run lint` 통과 (`eslint.config.mjs` 추가, localStorage hydration 패턴 정리)
 - `npm run dev -- --hostname 127.0.0.1 --port 3000`는 기존 `next dev` 인스턴스와 `.next/dev/lock` 점유로 완전 검증 보류
+- Playwright responsive QA pass completed across `/camp`, `/hackathons/daker-handover-2026-03`, `/war-room/T-HANDOVER-01`
+- Same-day responsive fix pass removed the blocking mobile overflow on `/war-room/:teamId` and improved mobile CTA density across `/camp` and detail tabs
+- QA evidence recorded in `docs/evidence/responsive-qa-phase2-playwright-2026-03-10.md`
 
 ## Canonical Source
 - `docs/ref/hackathons/daker-handover-2026-03.md`
@@ -50,17 +168,19 @@ Product: `Expedition Hub`
 - 팀 수 `43`, 조회수 `614`, 총상금 `1,000,000원`
 
 ## Open Gaps
-- 모바일/태블릿 반응형 세부 조정
-- `private-hidden` 필드 미노출 최종 검증
+- 실기기 기준 소프트 키보드 압축과 iOS/Android 뷰포트 차이 최종 확인
+- 모바일 대비, 텍스트 밀도, 피로도에 대한 수동 폰 패스 1회
+- 데스크톱 실제 포인터 기반 drag-and-drop 수동 확인 1회
 - 디자인 고도화(호버, 전환, 시각적 리듬)
 - Submission 1 기획서 문안 정리
 - Vercel 배포 및 제출 체크리스트 확정
+- `docs/status/INTEGRITY-REPORT.md`, `ai-context/master-plan.md` 최신 상태 반영
 
 ## Next Actions
-1. 모바일/태블릿에서 `/war-room/:teamId` 중심 반응형 QA를 수행한다.
-2. 공개 페이지와 팀 로컬 데이터 경계가 schema/privacy 규칙과 일치하는지 검증한다.
-3. Expedition Hub 기준 기획서 초안과 제출 체크리스트를 작성한다.
-4. Vercel 배포 후 공개 URL 검수 흐름을 고정한다.
+1. Run one manual phone pass for soft-keyboard compression, final contrast, and touch comfort.
+2. Do one focused browser pass for the stricter public submit handoff flow.
+3. Finalize Submission 1 copy and remaining delivery planning docs.
+4. Prepare Vercel deployment evidence and PDF packaging assets once the product is frozen.
 
 ## Recent Decisions
 - 제품 서비스명은 `Expedition Hub`

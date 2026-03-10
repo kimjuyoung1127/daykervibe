@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getItem } from '@/lib/storage';
 import { STORAGE_KEYS } from '@/lib/storage/keys';
+import { getDisplayHackathonStatus } from '@/lib/hackathon-detail';
 import type { Hackathon, HackathonStatus } from '@/lib/types';
 import PageShell from '@/components/layout/PageShell';
 import Card from '@/components/ui/Card';
@@ -20,7 +22,9 @@ const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'ended', label: '종료' },
 ];
 
-function formatDate(iso: string): string {
+function formatDate(iso?: string): string {
+  if (!iso) return '미공개';
+
   return new Date(iso).toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: '2-digit',
@@ -53,7 +57,14 @@ export default function HackathonsPage() {
 
   if (hackathons === null) return <LoadingState />;
 
-  const filtered = hackathons.filter(h => filter === 'all' || h.status === filter);
+  const normalizedHackathons = hackathons.map(hackathon => ({
+    ...hackathon,
+    status: getDisplayHackathonStatus(hackathon.status, hackathon.eventEndAt),
+  }));
+
+  const filtered = normalizedHackathons.filter(
+    hackathon => filter === 'all' || hackathon.status === filter,
+  );
 
   return (
     <PageShell>
@@ -66,12 +77,12 @@ export default function HackathonsPage() {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto">
+      <div className="mb-6 flex flex-wrap gap-2">
         {FILTERS.map(f => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`font-pixel text-[10px] px-3 py-1.5 whitespace-nowrap border-2 transition-colors ${
+            className={`min-h-10 border-2 px-3 py-2 font-pixel text-[10px] transition-colors ${
               filter === f.key
                 ? 'bg-accent-orange text-dark-bg border-accent-orange'
                 : 'bg-transparent text-card-white/70 border-dark-border hover:border-card-white/50'
@@ -80,7 +91,7 @@ export default function HackathonsPage() {
             {f.label}
           </button>
         ))}
-        <span className="ml-auto font-dunggeunmo text-xs text-card-white/50 self-center">
+        <span className="basis-full font-dunggeunmo text-xs text-card-white/50">
           {filtered.length} / {hackathons.length}
         </span>
       </div>
@@ -90,47 +101,58 @@ export default function HackathonsPage() {
         <EmptyState message="해당 조건의 해커톤이 없습니다" />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {filtered.map(h => (
-            <Link key={h.slug} href={`/hackathons/${h.slug}`}>
+          {filtered.map(hackathon => (
+            <Link key={hackathon.slug} href={`/hackathons/${hackathon.slug}`}>
               <Card className="h-full flex flex-col">
-                {/* Thumbnail placeholder */}
-                <div className="h-32 bg-dark-bg/20 border-b border-dark-border mb-3 flex items-center justify-center">
-                  <span className="font-pixel text-[8px] text-dark-bg/30">THUMBNAIL</span>
-                </div>
-
-                {/* Content */}
-                <div className="flex items-start justify-between mb-2">
-                  <StatusBadge status={h.status} />
-                  {h.teamCount !== undefined && (
+                {hackathon.thumbnailUrl && (
+                  <div className="mb-3 overflow-hidden border-2 border-dark-border/70 bg-dark-bg/5">
+                    <Image
+                      src={hackathon.thumbnailUrl}
+                      alt={hackathon.title}
+                      width={1200}
+                      height={900}
+                      sizes="(min-width: 1152px) 552px, (min-width: 640px) calc((100vw - 3rem) / 2), calc(100vw - 2rem)"
+                      className="h-auto w-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="mb-2 flex items-start justify-between gap-3">
+                  <StatusBadge status={hackathon.status} />
+                  {hackathon.teamCount !== undefined && (
                     <span className="font-dunggeunmo text-xs text-dark-bg/60">
-                      {h.teamCount} teams
+                      {hackathon.teamCount} teams
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-dunggeunmo font-bold text-base mb-1 line-clamp-2">
-                  {h.title}
+                <h3 className="mb-2 font-dunggeunmo text-base font-bold line-clamp-2">
+                  {hackathon.title}
                 </h3>
 
-                <p className="font-dunggeunmo text-xs text-dark-bg/60 mb-3">
-                  {formatDate(h.eventStartAt)} ~ {formatDate(h.eventEndAt)}
+                {hackathon.summary && (
+                  <p className="mb-3 font-dunggeunmo text-sm text-dark-bg/72 line-clamp-2">
+                    {hackathon.summary}
+                  </p>
+                )}
+
+                <p className="mb-3 font-dunggeunmo text-xs text-dark-bg/60">
+                  {formatDate(hackathon.eventStartAt)} ~ {formatDate(hackathon.eventEndAt)}
                 </p>
 
-                {/* Tags + Prize */}
-                <div className="mt-auto flex items-end justify-between">
+                <div className="mt-auto flex items-end justify-between gap-3">
                   <div className="flex flex-wrap gap-1">
-                    {h.tags.slice(0, 3).map(tag => (
+                    {hackathon.tags.slice(0, 3).map(tag => (
                       <span
                         key={tag}
-                        className="font-pixel text-[8px] px-2 py-0.5 bg-dark-bg/10 rounded-sm"
+                        className="rounded-sm bg-dark-bg/10 px-2 py-0.5 font-pixel text-[8px] text-dark-bg/80"
                       >
                         {tag}
                       </span>
                     ))}
                   </div>
-                  {h.prizeTotalKRW > 0 && (
-                    <span className="font-pixel text-[10px] text-accent-orange">
-                      {formatPrize(h.prizeTotalKRW)}
+                  {hackathon.prizeTotalKRW > 0 && (
+                    <span className="font-pixel text-[10px] text-dark-bg/80">
+                      {formatPrize(hackathon.prizeTotalKRW)}
                     </span>
                   )}
                 </div>

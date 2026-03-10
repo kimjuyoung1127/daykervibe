@@ -1,5 +1,31 @@
 # Expedition Hub Wireframe
 
+## 2026-03-10 SSOT Strict Alignment Addendum
+
+- `/hackathons/:slug`
+  - keeps the required 8-section layout even when some source detail is missing
+  - missing source-backed detail must render as an intentional limited-state panel, not a generic blank fallback
+- `Teams` section
+  - active hackathons may expose `작전실 이동`
+  - ended hackathons keep the team cards read-only and do not expose recruiting actions
+  - contact CTA rules:
+    - valid public link: `연락하기`
+    - invalid or unavailable link: `연락처 준비중`
+- `Submit` section
+  - remains visible on the public detail page
+  - now acts as `제출 가이드 + 최소 제출 패널 + 다음 행동 연결`
+  - ended hackathons switch this panel to an archive/read-only state instead of showing draft actions
+  - missing source-backed start dates render as `미공개`
+  - file-style public submit requirements use note-only prep fields, not real uploads
+  - invalid URL draft values do not advance submit readiness
+  - primary action routes:
+    - exactly one local team for the hackathon: `/war-room/:teamId`
+    - zero or multiple local teams: `/camp?hackathon=:slug`
+- `/war-room/:teamId`
+  - basecamp summary uses dark readable text on white-card surfaces
+  - workflow board supports desktop drag-and-drop and mobile move-button fallback
+  - when a public submit draft exists, the war-room shows an import notice after it absorbs that draft
+
 Last Updated: 2026-03-09 (KST)
 
 ## Design References

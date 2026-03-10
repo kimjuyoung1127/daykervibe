@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { getItem } from '@/lib/storage';
 import { STORAGE_KEYS } from '@/lib/storage/keys';
 import type { RankingProfile } from '@/lib/types';
@@ -62,6 +63,17 @@ export default function RankingsPage() {
         <p className="font-dunggeunmo text-card-white/70">
           탐험가들의 활약을 확인하세요
         </p>
+      </div>
+
+      <div className="mb-6 overflow-hidden border-2 border-dark-border bg-dark-border/30">
+        <Image
+          src="/ranking3.webp"
+          alt="Top 3 ranking visual"
+          width={1400}
+          height={700}
+          sizes="(min-width: 1152px) 1120px, calc(100vw - 2rem)"
+          className="h-auto w-full object-cover"
+        />
       </div>
 
       {/* Period Filter */}

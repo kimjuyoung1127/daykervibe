@@ -6,7 +6,7 @@ export interface Team {
   intro: string;
   isOpen: boolean;
   lookingFor: string[];
-  contactUrl: string;
+  contactUrl?: string;
   memberCount: number;
   /** @visibility private-hidden — never render */
   ownerLabel?: string;

@@ -1,5 +1,28 @@
 # Expedition Hub Submission 1 Draft
 
+## 2026-03-10 SSOT Strict Alignment Addendum
+
+- Public hackathon detail now keeps the submit section visible as a minimal draft panel, not a dead self-anchor CTA.
+- The product now stores public submit drafts browser-locally and hands them off to:
+  - `/war-room/:teamId` when exactly one local team matches the hackathon
+  - `/camp?hackathon=:slug` when the team context is absent or ambiguous
+- Broken demo contact links are no longer treated as public contact actions.
+- Source-incomplete hackathons now render a source-limited 8-section detail shell rather than a generic missing-content fallback.
+- Missing source-backed start dates now render as `미공개`.
+- File-style public submit requirements are note-only prep fields, and invalid URL draft values do not advance submit readiness.
+
+## 0. 2026-03-10 Alignment Addendum
+
+- Workflow movement is now implemented in the product:
+  - desktop supports real drag-and-drop between columns and within a column
+  - mobile supports the same movement through compact controls: `이전 컬럼`, `다음 컬럼`, `위로`, `아래로`
+- Link management wording should stay narrower than a full artifact editor:
+  - the current war-room UI shows seeded plan/GitHub examples and supports adding additional URL entries
+  - the add-link form does not yet expose a dedicated selector for every `SubmissionArtifact.kind`
+- Privacy wording can now be stronger:
+  - public routes do not expose team-local checklist, notes, member list, or seeded artifact links
+  - those fields remain visible only inside `/war-room/:teamId`
+
 기준일: 2026-03-09 (KST)
 제출 대상: `daker-handover-2026-03` 1차 기획서
 

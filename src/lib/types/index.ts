@@ -27,6 +27,9 @@ export type {
   SubmissionArtifact,
   SubmissionStatus,
   ArtifactKind,
+  PendingSubmitDraft,
+  PendingSubmitDraftField,
+  PendingSubmitInputType,
 } from './submission';
 
 export type { LeaderboardEntry } from './leaderboard';

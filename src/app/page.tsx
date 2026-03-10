@@ -71,10 +71,12 @@ export default function Home() {
             </div>
             <div className="flex-shrink-0">
               <Image
-                src="/logo.svg"
+                src="/og-image-hero.webp"
                 alt="Expedition Hub"
-                width={200}
-                height={200}
+                width={630}
+                height={630}
+                sizes="(min-width: 1024px) 520px, (min-width: 640px) 420px, calc(100vw - 2rem)"
+                priority
                 className="opacity-80"
               />
             </div>
@@ -95,6 +97,18 @@ export default function Home() {
             {featured.map(h => (
               <Link key={h.slug} href={`/hackathons/${h.slug}`}>
                 <Card className="h-full">
+                  {h.thumbnailUrl && (
+                    <div className="mb-3 overflow-hidden border-2 border-dark-border/70 bg-dark-bg/5">
+                      <Image
+                        src={h.thumbnailUrl}
+                        alt={h.title}
+                        width={1200}
+                        height={900}
+                        sizes="(min-width: 1024px) 360px, (min-width: 640px) calc(50vw - 2rem), calc(100vw - 2rem)"
+                        className="h-auto w-full object-cover"
+                      />
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <StatusBadge status={h.status} />
                   </div>

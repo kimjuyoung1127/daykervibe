@@ -26,7 +26,7 @@ export default function PixelButton({
   className = '',
   type = 'button',
 }: PixelButtonProps) {
-  const base = `inline-flex items-center justify-center font-pixel text-xs px-4 py-2 transition-all ${VARIANT_STYLES[variant]} ${className}`;
+  const base = `inline-flex min-h-10 items-center justify-center font-pixel text-xs px-4 py-2 transition-all ${VARIANT_STYLES[variant]} ${className}`;
 
   if (href) {
     return (

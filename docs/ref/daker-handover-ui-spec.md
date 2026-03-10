@@ -1,5 +1,30 @@
 # Daker Handover UI Spec
 
+## 2026-03-10 Implementation Alignment Addendum
+
+- `Submit` on `/hackathons/:slug`
+  - stays present on the public detail page
+  - current product behavior is:
+    - show guide copy
+    - show a minimal submit draft panel
+    - route the user to either scoped camp or the team war-room for authoritative submission management
+  - file-style public submit requirements are note-only preparation fields, not uploads
+  - invalid URL draft values do not advance readiness or create artifact links
+- `Authoritative submission management`
+  - remains team-local in `/war-room/:teamId`
+  - public detail must not directly expose team-local notes, checklist, or stored artifact links
+- `Teams`
+  - public contact links are shown only when the bootstrap source yields a valid public URL
+  - invalid placeholder links are intentionally rendered as `연락처 준비중`
+  - ended hackathons keep team cards visible as archive information, but do not expose recruiting or war-room entry actions
+- `Missing source detail`
+  - the route still renders the required section shell
+  - missing source-backed detail is labeled as limited/unavailable instead of being filled with invented content
+  - missing source-backed start dates render as `미공개`
+- `Ended hackathon submit state`
+  - the submit section remains visible for archive context
+  - ended hackathons do not expose new draft-saving actions from the public detail route
+
 이 문서는 [docs/ref/hackathons/daker-handover-2026-03.md](/C:/Users/gmdqn/daykervibe/docs/ref/hackathons/daker-handover-2026-03.md)의 `Product Spec`을 구현 관점으로 재정렬한 파생 문서다.
 값 충돌 시 SSOT가 우선한다.
 

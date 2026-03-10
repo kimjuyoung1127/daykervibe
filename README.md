@@ -1,63 +1,189 @@
 # Expedition Hub
 
-Expedition Hub는 원정대 구성부터 제출 준비 워크플로우 관리, 결과 확인까지 이어지는 재사용형 해커톤 실행 포털을 설계하고 구현하기 위한 문서-우선 워크스페이스입니다.
+Expedition Hub is a reusable hackathon operations portal built around one end-to-end flow:
 
-이번 프로젝트는 `daker-handover-2026-03` 해커톤을 첫 사례로 사용하지만, 단건 이벤트 페이지가 아니라 다음 대회에도 재사용 가능한 운영 포털 구조를 목표로 합니다.
+`discover hackathons -> form a team -> prepare submission -> understand results`
 
-## Core Product Definition
+The current build is focused on six core routes, browser-local persistence with `localStorage`, and a reviewer-friendly public flow that connects into a team-local war-room experience.
 
-- 모집 -> 원정대 구성 -> 제출 준비 -> 평가 이해까지 이어지는 해커톤 실행 포털
-- 8비트 게이머 감성 랜딩 + 운영 가독성 중심 포털 UI
-- `Next.js + TypeScript + Tailwind + localStorage + Vercel` 기준 설계
-- `원정대`, `베이스캠프`, `작전실` 용어를 계승하되, 작전실을 제출 준비 관리 허브로 재정의
+## Current Build Status
+
+- Product: `Expedition Hub`
+- Focus hackathon: `daker-handover-2026-03`
+- Stack: `Next.js 16 + TypeScript + Tailwind v4 + localStorage`
+- Core routes implemented:
+  - `/`
+  - `/hackathons`
+  - `/hackathons/:slug`
+  - `/camp`
+  - `/rankings`
+  - `/war-room/:teamId`
+- Validation completed:
+  - `npm run lint`
+  - `npm run build`
+  - Playwright responsive QA pass with follow-up mobile overflow fix
+  - privacy boundary evidence pass
+  - desktop drag-and-drop sanity confirmation
+- Current phase: `Phase 2 - QA + extension`
+
+## Product Shape
+
+- Public portal:
+  - landing, hackathon discovery, detail, rankings
+- Team-local flow:
+  - camp entry into war-room
+  - basecamp summary
+  - submission stage tracking
+  - workflow board
+  - checklist, notes, link management
+- Data boundary:
+  - public routes show public entities only
+  - team-local state lives in browser storage
+  - private-hidden fields must never render
+
+## Route Overview
+
+| Route | Purpose | Current status |
+| --- | --- | --- |
+| `/` | Landing and portal entry | done |
+| `/hackathons` | Hackathon directory and filter flow | done |
+| `/hackathons/:slug` | 8-section detail experience | done |
+| `/camp` | Team recruitment, creation, scoped camp flow | done |
+| `/rankings` | Global ranking board | done |
+| `/war-room/:teamId` | Team-local submission preparation hub | done |
+
+## Visual Maps
+
+### Route Map
+
+```mermaid
+graph TD
+  Home["/"]
+  List["/hackathons"]
+  Detail["/hackathons/:slug"]
+  Camp["/camp"]
+  Rankings["/rankings"]
+  WarRoom["/war-room/:teamId"]
+
+  Home --> List
+  Home --> Camp
+  Home --> Rankings
+  List --> Detail
+  Detail --> Camp
+  Detail --> WarRoom
+  Camp --> WarRoom
+```
+
+### User Flow
+
+```mermaid
+flowchart LR
+  A["Discover hackathon"] --> B["Open detail page"]
+  B --> C["Find or create team in camp"]
+  C --> D["Enter war-room"]
+  D --> E["Track submission stage"]
+  E --> F["Manage checklist, notes, links"]
+  F --> G["Review rankings and result context"]
+```
+
+### Document And Evidence Map
+
+```mermaid
+graph TD
+  SSOT["SSOT"]
+  PRD["PRD"]
+  Schema["Schema"]
+  Wireframe["Wireframe"]
+  Arch["Architecture"]
+  Status["Project Status"]
+  Checklist["Cross-Check Checklist"]
+  Daily["Daily Logs"]
+  Evidence["Evidence Docs"]
+  Submission["Submission Assets"]
+
+  SSOT --> PRD
+  SSOT --> Schema
+  SSOT --> Wireframe
+  SSOT --> Arch
+  PRD --> Status
+  Schema --> Status
+  Wireframe --> Status
+  Arch --> Status
+  Status --> Checklist
+  Checklist --> Daily
+  Daily --> Evidence
+  Evidence --> Submission
+```
 
 ## Source Of Truth
 
-- Canonical SSOT:
-  - [docs/ref/hackathons/daker-handover-2026-03.md](/C:/Users/gmdqn/daykervibe/docs/ref/hackathons/daker-handover-2026-03.md)
+- Canonical source:
+  - [docs/ref/hackathons/daker-handover-2026-03.md](docs/ref/hackathons/daker-handover-2026-03.md)
 
 ## Key Documents
 
-- PRD:
-  - [docs/Prd.md](/C:/Users/gmdqn/daykervibe/docs/Prd.md)
-- Schema:
-  - [docs/schema.md](/C:/Users/gmdqn/daykervibe/docs/schema.md)
-- Wireframe:
-  - [docs/wireframe.md](/C:/Users/gmdqn/daykervibe/docs/wireframe.md)
-- Architecture:
-  - [docs/architecture-diagrams.md](/C:/Users/gmdqn/daykervibe/docs/architecture-diagrams.md)
-- Master plan:
-  - [ai-context/master-plan.md](/C:/Users/gmdqn/daykervibe/ai-context/master-plan.md)
-- Project status:
-  - [docs/status/PROJECT-STATUS.md](/C:/Users/gmdqn/daykervibe/docs/status/PROJECT-STATUS.md)
-- Submission 1 draft:
-  - [docs/plans/expedition-hub-submission-1-draft.md](/C:/Users/gmdqn/daykervibe/docs/plans/expedition-hub-submission-1-draft.md)
+- Product definition:
+  - [docs/Prd.md](docs/Prd.md)
+  - [docs/schema.md](docs/schema.md)
+  - [docs/wireframe.md](docs/wireframe.md)
+  - [docs/architecture-diagrams.md](docs/architecture-diagrams.md)
+- Project tracking:
+  - [docs/status/PROJECT-STATUS.md](docs/status/PROJECT-STATUS.md)
+  - [docs/status/PAGE-UPGRADE-BOARD.md](docs/status/PAGE-UPGRADE-BOARD.md)
+  - [docs/status/CROSS-CHECK-CHECKLIST.md](docs/status/CROSS-CHECK-CHECKLIST.md)
+- Planning:
+  - [ai-context/master-plan.md](ai-context/master-plan.md)
+  - [docs/plans/daker-handover-master-plan.md](docs/plans/daker-handover-master-plan.md)
+  - [docs/plans/expedition-hub-submission-1-draft.md](docs/plans/expedition-hub-submission-1-draft.md)
 
 ## Evidence Assets
 
 - Daily logs:
-  - [docs/daily/2026-03-09/portal-doc-system-bootstrap.md](/C:/Users/gmdqn/daykervibe/docs/daily/2026-03-09/portal-doc-system-bootstrap.md)
-  - [docs/daily/2026-03-09/dayker-war-room-redefinition.md](/C:/Users/gmdqn/daykervibe/docs/daily/2026-03-09/dayker-war-room-redefinition.md)
-- Integrity report:
-  - [docs/status/INTEGRITY-REPORT.md](/C:/Users/gmdqn/daykervibe/docs/status/INTEGRITY-REPORT.md)
-- Automation health:
-  - [docs/status/AUTOMATION-HEALTH.md](/C:/Users/gmdqn/daykervibe/docs/status/AUTOMATION-HEALTH.md)
+  - [docs/daily/2026-03-09/portal-doc-system-bootstrap.md](docs/daily/2026-03-09/portal-doc-system-bootstrap.md)
+  - [docs/daily/2026-03-09/dayker-war-room-redefinition.md](docs/daily/2026-03-09/dayker-war-room-redefinition.md)
+  - [docs/daily/2026-03-10/phase-1-complete-and-phase-2-handoff-sync.md](docs/daily/2026-03-10/phase-1-complete-and-phase-2-handoff-sync.md)
+  - [docs/daily/2026-03-10/cross-check-checklist-created.md](docs/daily/2026-03-10/cross-check-checklist-created.md)
+- Evidence docs:
+  - [docs/evidence/dev-process-phase0.md](docs/evidence/dev-process-phase0.md)
+  - [docs/evidence/dev-process-phase1b-navigation-and-camp-flow.md](docs/evidence/dev-process-phase1b-navigation-and-camp-flow.md)
+  - [docs/evidence/responsive-qa-phase2-playwright-2026-03-10.md](docs/evidence/responsive-qa-phase2-playwright-2026-03-10.md)
+  - [docs/evidence/war-room-drag-and-privacy-verification-2026-03-10.md](docs/evidence/war-room-drag-and-privacy-verification-2026-03-10.md)
+  - [docs/evidence/ssot-strict-alignment-2026-03-10.md](docs/evidence/ssot-strict-alignment-2026-03-10.md)
 
-## Planned Routes
+## Design References
 
-- `/`
-- `/hackathons`
-- `/hackathons/:slug`
-- `/camp`
-- `/rankings`
-- `/war-room/:teamId`
+- Page references:
+  - [public/design_reference/landing_page.png](public/design_reference/landing_page.png)
+  - [public/design_reference/hackathon_listing.png](public/design_reference/hackathon_listing.png)
+  - [public/design_reference/hackathon_detail.png](public/design_reference/hackathon_detail.png)
+  - [public/design_reference/camp_recruitment.png](public/design_reference/camp_recruitment.png)
+  - [public/design_reference/rankings.png](public/design_reference/rankings.png)
+  - [public/design_reference/war_room.png](public/design_reference/war_room.png)
+- Shared component reference:
+  - [public/design_reference/1.png](public/design_reference/1.png)
 
-## Design Reference
+## Local Development
 
-- 8비트 레퍼런스:
-  - [public/design_reference/1.png](/C:/Users/gmdqn/daykervibe/public/design_reference/1.png)
+```bash
+npm install
+npm run dev
+```
+
+Useful validation commands:
+
+```bash
+npm run lint
+npm run build
+```
+
+## Current Gaps
+
+- Real-device phone QA is still missing.
+- The stricter public submit handoff flow still needs one focused browser pass.
+- Deployment evidence, final submission copy, and PDF packaging assets are intentionally deferred until the build is closer to freeze.
 
 ## Notes
 
-- NotebookLM 기반 리서치는 프로젝트 문서에 흡수된 상태로 간주합니다.
-- 자동화 프롬프트는 제품 기능이 아니라 문서 정합성과 개발 운영 증빙을 위한 자산입니다.
+- The product is intentionally `localStorage`-first. No backend is required for the current judging scope.
+- War-room is a submission-preparation hub, not a full real-time collaboration suite.
+- Documentation is treated as judging evidence, not only as internal notes.

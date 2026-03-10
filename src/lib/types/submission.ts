@@ -4,6 +4,9 @@ export type SubmissionStatus = 'empty' | 'draft' | 'submitted';
 /** @visibility team-local */
 export type ArtifactKind = 'plan_url' | 'web_url' | 'github_url' | 'pdf_url';
 
+/** @visibility browser-local */
+export type PendingSubmitInputType = 'text' | 'url' | 'file';
+
 export interface Submission {
   id: string;
   /** @visibility public */
@@ -29,4 +32,22 @@ export interface SubmissionArtifact {
   kind: ArtifactKind;
   url: string;
   label?: string;
+}
+
+/** @visibility browser-local */
+export interface PendingSubmitDraftField {
+  key: string;
+  label: string;
+  inputType: PendingSubmitInputType;
+  value: string;
+  stage?: 'plan' | 'web' | 'pdf';
+  artifactKind?: ArtifactKind;
+}
+
+/** @visibility browser-local */
+export interface PendingSubmitDraft {
+  hackathonSlug: string;
+  notes?: string;
+  fields: PendingSubmitDraftField[];
+  updatedAt: string;
 }
