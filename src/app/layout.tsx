@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Providers from "./providers";
+import TopNav from "@/components/layout/TopNav";
+import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
 const pressStart2P = localFont({
@@ -30,7 +32,13 @@ export default function RootLayout({
       <body
         className={`${pressStart2P.variable} ${dungGeunMo.variable} bg-dark-bg text-card-white font-dunggeunmo antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="flex flex-col min-h-screen">
+            <TopNav />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );
