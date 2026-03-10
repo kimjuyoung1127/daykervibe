@@ -18,7 +18,10 @@ interface TeamsSectionProps {
   hackathonSlug: string;
 }
 
-export default function TeamsSection({ content, hackathonSlug }: TeamsSectionProps) {
+export default function TeamsSection({
+  content,
+  hackathonSlug,
+}: TeamsSectionProps) {
   const data: TeamsData = JSON.parse(content);
   const [teams, setTeams] = useState<Team[]>([]);
 
@@ -27,8 +30,9 @@ export default function TeamsSection({ content, hackathonSlug }: TeamsSectionPro
 
     queueMicrotask(() => {
       if (cancelled) return;
-      const all = getItem<Team[]>(STORAGE_KEYS.TEAMS) ?? [];
-      setTeams(all.filter(t => t.hackathonSlug === hackathonSlug));
+
+      const allTeams = getItem<Team[]>(STORAGE_KEYS.TEAMS) ?? [];
+      setTeams(allTeams.filter(team => team.hackathonSlug === hackathonSlug));
     });
 
     return () => {
@@ -41,29 +45,47 @@ export default function TeamsSection({ content, hackathonSlug }: TeamsSectionPro
       {teams.length === 0 ? (
         <EmptyState message="아직 등록된 팀이 없습니다" />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {teams.map(t => (
-            <Card key={t.id} hover={false}>
-              <div className="flex items-start justify-between mb-1">
-                <h4 className="font-dunggeunmo font-bold text-sm">{t.name}</h4>
-                <span className={`font-pixel text-[8px] px-1.5 py-0.5 ${
-                  t.isOpen ? 'bg-accent-mint text-dark-bg' : 'bg-dark-border text-card-white'
-                }`}>
-                  {t.isOpen ? 'RECRUITING' : 'CLOSED'}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {teams.map(team => (
+            <Card key={team.id} hover={false} className="flex flex-col">
+              <div className="mb-1 flex items-start justify-between gap-3">
+                <h4 className="font-dunggeunmo text-sm font-bold">{team.name}</h4>
+                <span
+                  className={`px-1.5 py-0.5 font-pixel text-[8px] ${
+                    team.isOpen
+                      ? 'bg-accent-mint text-dark-bg'
+                      : 'bg-dark-border text-card-white'
+                  }`}
+                >
+                  {team.isOpen ? 'RECRUITING' : 'CLOSED'}
                 </span>
               </div>
-              <p className="font-dunggeunmo text-xs text-dark-bg/70 mb-2">{t.intro}</p>
-              <div className="flex items-center justify-between">
-                <div className="flex gap-1">
-                  {t.lookingFor.map(role => (
-                    <span key={role} className="font-pixel text-[7px] px-1.5 py-0.5 bg-dark-bg/10">
+              <p className="mb-2 font-dunggeunmo text-xs text-dark-bg/70">
+                {team.intro}
+              </p>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div className="flex flex-wrap gap-1">
+                  {team.lookingFor.map(role => (
+                    <span
+                      key={role}
+                      className="bg-dark-bg/10 px-1.5 py-0.5 font-pixel text-[7px]"
+                    >
                       #{role}
                     </span>
                   ))}
                 </div>
                 <span className="font-dunggeunmo text-xs text-dark-bg/60">
-                  {t.memberCount}명
+                  {team.memberCount}명
                 </span>
+              </div>
+              <div className="mt-auto flex justify-end">
+                <PixelButton
+                  href={`/war-room/${team.id}`}
+                  variant="ghost"
+                  className="px-2 py-1 text-[8px]"
+                >
+                  작전실 이동
+                </PixelButton>
               </div>
             </Card>
           ))}
@@ -73,7 +95,7 @@ export default function TeamsSection({ content, hackathonSlug }: TeamsSectionPro
       {data.campEnabled && (
         <div className="text-center pt-2">
           <PixelButton href="/camp" variant="ghost">
-            CAMP에서 팀 찾기 →
+            CAMP에서 팀 찾기
           </PixelButton>
         </div>
       )}

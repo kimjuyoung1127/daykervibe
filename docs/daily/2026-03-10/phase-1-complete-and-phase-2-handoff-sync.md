@@ -53,3 +53,16 @@
 - Next:
   1. Add war-room deep links in the hackathon detail teams section
   2. Reword status docs around discoverability and remaining SSOT gaps
+
+## Phase 2 - Detail Teams Deep Link
+- Scope:
+  - Add `작전실 이동` CTA to each team card in the hackathon detail teams section
+  - Keep the existing `/camp` CTA so the public recruitment flow still works
+- Why:
+  - The detail page explains the team-building flow, so it also needs a direct bridge into the war-room route.
+  - This closes the second major discoverability gap found in the SSOT re-check.
+- Validation:
+  - Each seeded team card in the teams section now exposes a direct link to `/war-room/:teamId`
+  - The section-level CTA to `/camp` remains unchanged
+- Next:
+  1. Reword status docs around discoverability and remaining SSOT gaps
