@@ -1,17 +1,6 @@
+import { dDay, formatPrize } from '@/lib/format';
 import type { Hackathon } from '@/lib/types';
 import StatusBadge from '@/components/ui/StatusBadge';
-
-function formatPrize(krw: number): string {
-  if (krw >= 10000) return `${(krw / 10000).toLocaleString()}만원`;
-  return `${krw.toLocaleString()}원`;
-}
-
-function dDay(endAt: string): string {
-  const diff = Math.ceil((new Date(endAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-  if (diff > 0) return `D-${diff}`;
-  if (diff === 0) return 'D-DAY';
-  return '종료';
-}
 
 interface SummaryBarProps {
   hackathon: Hackathon;

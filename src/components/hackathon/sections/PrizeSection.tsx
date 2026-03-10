@@ -1,12 +1,10 @@
+import { formatKRW } from '@/lib/format';
+
 interface PrizeData {
   items?: {
     place: string;
     amountKRW: number;
   }[];
-}
-
-function formatKRW(amount: number): string {
-  return `${amount.toLocaleString('ko-KR')}원`;
 }
 
 export default function PrizeSection({ content }: { content: string }) {

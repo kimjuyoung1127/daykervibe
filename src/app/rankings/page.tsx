@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { formatPoints } from '@/lib/format';
 import { getItem } from '@/lib/storage';
 import { STORAGE_KEYS } from '@/lib/storage/keys';
 import type { RankingProfile } from '@/lib/types';
@@ -121,7 +122,7 @@ export default function RankingsPage() {
                   {r.nickname}
                 </span>
                 <span className={`col-span-2 font-pixel text-xs text-right ${getRankStyle(rank)}`}>
-                  {r.points.toLocaleString()}
+                  {formatPoints(r.points)}
                 </span>
                 <span className="col-span-5 font-dunggeunmo text-xs text-card-white/60 truncate">
                   {r.activitySummary ?? '-'}

@@ -1,19 +1,11 @@
+import { formatDatetime } from '@/lib/format';
+
 interface ScheduleData {
   timezone?: string;
   milestones?: {
     name: string;
     at: string;
   }[];
-}
-
-function formatDatetime(iso: string): string {
-  return new Date(iso).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 }
 
 function isPast(iso: string): boolean {

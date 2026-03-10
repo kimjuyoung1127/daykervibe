@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatDate, formatPrize } from '@/lib/format';
 import { getItem } from '@/lib/storage';
 import { STORAGE_KEYS } from '@/lib/storage/keys';
 import { getDisplayHackathonStatus } from '@/lib/hackathon-detail';
@@ -21,21 +22,6 @@ const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'ongoing', label: '진행중' },
   { key: 'ended', label: '종료' },
 ];
-
-function formatDate(iso?: string): string {
-  if (!iso) return '미공개';
-
-  return new Date(iso).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-}
-
-function formatPrize(krw: number): string {
-  if (krw >= 10000) return `${(krw / 10000).toLocaleString()}만원`;
-  return `${krw.toLocaleString()}원`;
-}
 
 export default function HackathonsPage() {
   const [hackathons, setHackathons] = useState<Hackathon[] | null>(null);
