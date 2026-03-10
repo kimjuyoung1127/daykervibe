@@ -97,3 +97,15 @@
 - Next:
   1. Continue responsive QA around `/camp` and `/war-room/:teamId`
   2. Run final privacy checks for `private-hidden` fields
+
+## Phase 5 - Evidence Packaging
+- Scope:
+  - Add a dedicated evidence asset for Phase 1B navigation recovery and camp query flow alignment
+- Why:
+  - Daily logs are useful for chronology, but submission evidence also needs a standalone artifact that explains intent, validation, and judging relevance in one place.
+- Validation:
+  - `docs/evidence/dev-process-phase1b-navigation-and-camp-flow.md` created
+  - Evidence content now captures the war-room discoverability fix, `/camp?hackathon=:slug` flow, validation results, and commit history
+- Next:
+  1. Continue responsive QA around `/camp` and `/war-room/:teamId`
+  2. Run final privacy checks for `private-hidden` fields
