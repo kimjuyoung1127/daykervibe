@@ -36,16 +36,6 @@ export function formatDate(iso?: string): string {
   });
 }
 
-export function formatDatetime(iso: string): string {
-  return new Date(iso).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
 export function dDay(endAt: string): string {
   const diff = Math.ceil((new Date(endAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   if (diff > 0) return `D-${diff}`;

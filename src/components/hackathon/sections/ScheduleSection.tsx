@@ -1,4 +1,4 @@
-import { formatDatetime } from '@/lib/format';
+import { formatDateTime } from '@/lib/format';
 
 interface ScheduleData {
   timezone?: string;
@@ -45,7 +45,7 @@ export default function ScheduleSection({ content }: { content: string }) {
                 {m.name}
               </p>
               <p className="font-pixel text-[8px] text-card-white/40 mt-0.5">
-                {formatDatetime(m.at)}
+                {formatDateTime(m.at)}
               </p>
             </div>
           </div>
