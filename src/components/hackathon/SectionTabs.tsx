@@ -24,7 +24,7 @@ export default function SectionTabs({ sections, active, onSelect }: SectionTabsP
         <button
           key={type}
           onClick={() => onSelect(type)}
-          className={`-mb-[2px] min-h-10 whitespace-nowrap border-b-2 px-4 py-2 font-pixel text-[10px] transition-colors ${
+          className={`-mb-[2px] min-h-10 whitespace-nowrap border-b-2 px-3 py-2 sm:px-5 sm:py-2.5 font-pixel text-[10px] sm:text-xs md:text-sm transition-colors ${
             active === type
               ? 'text-accent-orange border-accent-orange'
               : 'text-card-white/50 border-transparent hover:text-card-white/80'
