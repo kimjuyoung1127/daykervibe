@@ -1,5 +1,15 @@
 # Project Status
 
+## 2026-03-11 Addendum - Share Preview Metadata
+
+- Root metadata
+  - `metadataBase`, `canonical`, `openGraph`, `twitter` 메타를 추가해 배포 URL 기준 절대 공유 메타가 생성되도록 정렬
+  - 대표 공유 이미지는 `public/og-image-hero.webp`를 사용
+  - 카카오톡/메신저 미리보기에서 텍스트-only 카드가 아니라 이미지 포함 카드가 노출되도록 보강
+- Validation:
+  - `npm run lint` passed
+  - `npm run build` passed
+
 ## 2026-03-11 Addendum - Detail Summary and Submit Flow SSOT Gap Closure
 
 - `/hackathons/:slug`

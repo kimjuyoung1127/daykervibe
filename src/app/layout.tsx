@@ -19,8 +19,34 @@ const dungGeunMo = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://daykervibe.vercel.app"),
   title: "EXPEDITION HUB — Hackathon Operations Portal",
   description: "재사용 가능한 해커톤 운영 포털",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: "/",
+    title: "EXPEDITION HUB — Hackathon Operations Portal",
+    description: "재사용 가능한 해커톤 운영 포털",
+    siteName: "Expedition Hub",
+    locale: "ko_KR",
+    images: [
+      {
+        url: "/og-image-hero.webp",
+        width: 1200,
+        height: 630,
+        alt: "Expedition Hub open graph preview",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EXPEDITION HUB — Hackathon Operations Portal",
+    description: "재사용 가능한 해커톤 운영 포털",
+    images: ["/og-image-hero.webp"],
+  },
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },

@@ -13,6 +13,7 @@
 - `/hackathons/:slug` SummaryBar에 `기간`, `조회수`를 추가해 SSOT 요약 항목을 모두 맞췄다.
 - 해커톤 상세 Teams Section에 `원정대 만들기` CTA를 추가해 `/camp` 생성 폼을 직접 열 수 있게 했다.
 - Submit Section에 파일형 제출용 `file input`을 추가하고, 선택 파일명을 pending draft로 저장하도록 보강했다.
+- 루트 메타데이터에 `openGraph`, `twitter`, `metadataBase`를 추가해 카카오톡 공유 카드에 대표 이미지가 붙도록 정리했다.
 
 ## Why
 - 모집중인 해커톤이 목록 상단에 오지 않으면 참가자 탐색 효율이 떨어졌다.
@@ -65,6 +66,9 @@
   - 선택한 파일명만 브라우저 draft에 저장하도록 변경
 - `src/lib/submission-drafts.ts`
   - 파일 선택 draft도 stage draft와 notes에 반영되도록 보강
+- `src/app/layout.tsx`
+  - `metadataBase`, `canonical`, `openGraph`, `twitter` 메타 추가
+  - 공유 대표 이미지로 `og-image-hero.webp` 연결
 
 ## Validation
 - `npm run lint`
@@ -81,3 +85,4 @@
 - 작전실 설명 문구에서 `협업이 아닌 허브`처럼 읽히던 표현을 걷어내고, `팀 전용 협업 흐름 + 제출 준비 관리 허브` 방향으로 정리했다.
   - `docs/Prd.md`, `docs/status/PROJECT-STATUS.md`
 - `docs/status/INTEGRITY-REPORT.md`, `ai-context/master-plan.md`를 현재 구현 상태에 맞게 갱신했다.
+- 배포 공유 메타를 추가해 카카오톡 등 메신저에서 이미지 포함 미리보기가 가능하도록 맞췄다.
