@@ -10,6 +10,8 @@ import PageShell from '@/components/layout/PageShell';
 import Card from '@/components/ui/Card';
 import StatusBadge from '@/components/ui/StatusBadge';
 import PixelButton from '@/components/ui/PixelButton';
+import EmptyState from '@/components/ui/EmptyState';
+import ErrorState from '@/components/ui/ErrorState';
 import LoadingState from '@/components/ui/LoadingState';
 
 const FEATURES = [
@@ -22,14 +24,28 @@ const FEATURES = [
 
 export default function Home() {
   const [hackathons, setHackathons] = useState<Hackathon[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     queueMicrotask(() => {
       if (cancelled) return;
-      const data = getItem<Hackathon[]>(STORAGE_KEYS.HACKATHONS);
-      setHackathons(data ?? []);
+      try {
+        const data = getItem<Hackathon[]>(STORAGE_KEYS.HACKATHONS);
+
+        if (data !== null && !Array.isArray(data)) {
+          throw new Error('해커톤 데이터를 불러오지 못했습니다.');
+        }
+
+        setHackathons(data ?? []);
+        setLoadError(null);
+      } catch (error) {
+        setHackathons([]);
+        setLoadError(
+          error instanceof Error ? error.message : '해커톤 데이터를 불러오지 못했습니다.',
+        );
+      }
     });
 
     return () => {
@@ -38,6 +54,20 @@ export default function Home() {
   }, []);
 
   if (hackathons === null) return <LoadingState />;
+  if (loadError) {
+    return (
+      <PageShell>
+        <ErrorState message={loadError} />
+      </PageShell>
+    );
+  }
+  if (hackathons.length === 0) {
+    return (
+      <PageShell>
+        <EmptyState message="표시할 해커톤이 없습니다." />
+      </PageShell>
+    );
+  }
 
   const featured = hackathons
     .filter(h => h.status !== 'ended')

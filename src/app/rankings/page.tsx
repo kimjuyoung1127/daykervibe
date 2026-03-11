@@ -9,6 +9,7 @@ import type { RankingProfile } from '@/lib/types';
 import PageShell from '@/components/layout/PageShell';
 import LoadingState from '@/components/ui/LoadingState';
 import EmptyState from '@/components/ui/EmptyState';
+import ErrorState from '@/components/ui/ErrorState';
 
 type PeriodFilter = '7d' | '30d' | 'all';
 
@@ -35,14 +36,28 @@ function getRankBg(rank: number): string {
 export default function RankingsPage() {
   const [rankings, setRankings] = useState<RankingProfile[] | null>(null);
   const [period, setPeriod] = useState<PeriodFilter>('all');
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     queueMicrotask(() => {
       if (cancelled) return;
-      const data = getItem<RankingProfile[]>(STORAGE_KEYS.RANKINGS);
-      setRankings(data ?? []);
+      try {
+        const data = getItem<RankingProfile[]>(STORAGE_KEYS.RANKINGS);
+
+        if (data !== null && !Array.isArray(data)) {
+          throw new Error('랭킹 데이터를 불러오지 못했습니다.');
+        }
+
+        setRankings(data ?? []);
+        setLoadError(null);
+      } catch (error) {
+        setRankings([]);
+        setLoadError(
+          error instanceof Error ? error.message : '랭킹 데이터를 불러오지 못했습니다.',
+        );
+      }
     });
 
     return () => {
@@ -51,6 +66,13 @@ export default function RankingsPage() {
   }, []);
 
   if (rankings === null) return <LoadingState />;
+  if (loadError) {
+    return (
+      <PageShell>
+        <ErrorState message={loadError} />
+      </PageShell>
+    );
+  }
 
   const filtered = rankings
     .filter(r => r.period === period)
@@ -78,7 +100,7 @@ export default function RankingsPage() {
       </div>
 
       {/* Period Filter */}
-      <div className="flex gap-2 mb-6">
+      <div className="mb-6 flex flex-wrap gap-2">
         {PERIOD_LABELS.map(p => (
           <button
             key={p.key}
@@ -100,7 +122,7 @@ export default function RankingsPage() {
       ) : (
         <div className="space-y-2">
           {/* Header row */}
-          <div className="grid grid-cols-12 gap-2 px-4 py-2 font-pixel text-[8px] text-card-white/50">
+          <div className="hidden grid-cols-12 gap-3 px-4 py-2 font-pixel text-[8px] text-card-white/50 md:grid">
             <span className="col-span-1">RANK</span>
             <span className="col-span-4">NICKNAME</span>
             <span className="col-span-2 text-right">POINTS</span>
@@ -113,20 +135,40 @@ export default function RankingsPage() {
             return (
               <div
                 key={r.id}
-                className={`grid grid-cols-12 gap-2 px-4 py-3 border-2 ${getRankBg(rank)} transition-colors`}
+                className={`border-2 px-4 py-3 transition-colors ${getRankBg(rank)}`}
               >
-                <span className={`col-span-1 font-pixel text-sm ${getRankStyle(rank)}`}>
-                  #{rank}
-                </span>
-                <span className="col-span-4 font-dunggeunmo font-bold text-card-white truncate">
-                  {r.nickname}
-                </span>
-                <span className={`col-span-2 font-pixel text-xs text-right ${getRankStyle(rank)}`}>
-                  {formatPoints(r.points)}
-                </span>
-                <span className="col-span-5 font-dunggeunmo text-xs text-card-white/60 truncate">
-                  {r.activitySummary ?? '-'}
-                </span>
+                <div className="flex items-start justify-between gap-3 md:hidden">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-3">
+                      <span className={`shrink-0 font-pixel text-sm ${getRankStyle(rank)}`}>
+                        #{rank}
+                      </span>
+                      <span className="min-w-0 break-words font-dunggeunmo font-bold leading-tight text-card-white">
+                        {r.nickname}
+                      </span>
+                    </div>
+                    <p className="mt-2 break-words font-dunggeunmo text-xs leading-snug text-card-white/60">
+                      {r.activitySummary ?? '-'}
+                    </p>
+                  </div>
+                  <span className={`shrink-0 pt-0.5 text-right font-pixel text-xs ${getRankStyle(rank)}`}>
+                    {formatPoints(r.points)}
+                  </span>
+                </div>
+                <div className="hidden grid-cols-12 gap-3 md:grid">
+                  <span className={`col-span-1 font-pixel text-sm ${getRankStyle(rank)}`}>
+                    #{rank}
+                  </span>
+                  <span className="col-span-4 min-w-0 truncate font-dunggeunmo font-bold text-card-white">
+                    {r.nickname}
+                  </span>
+                  <span className={`col-span-2 font-pixel text-xs text-right ${getRankStyle(rank)}`}>
+                    {formatPoints(r.points)}
+                  </span>
+                  <span className="col-span-5 min-w-0 truncate font-dunggeunmo text-xs text-card-white/60">
+                    {r.activitySummary ?? '-'}
+                  </span>
+                </div>
               </div>
             );
           })}

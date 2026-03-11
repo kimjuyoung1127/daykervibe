@@ -1,5 +1,46 @@
 # Project Status
 
+## 2026-03-11 Addendum - Camp CRUD and Common State UI Alignment
+
+- `/camp`
+  - 원정대 생성/수정 폼에 `isOpen` 입력을 추가해 `모집중` / `모집 마감` 상태를 직접 저장 가능하게 정렬
+  - 로컬에서 만든 커스텀 팀만 `수정`, `모집 마감` 액션을 노출하도록 분리
+  - 수정 모드에서 기존 값을 프리필하고 저장 시 `updatedAt`을 갱신
+  - `모집 마감`은 삭제가 아니라 `isOpen=false` 상태 전환으로 처리
+- 공통 상태 UI 정합성
+  - 핵심 6개 라우트 `/`, `/hackathons`, `/hackathons/:slug`, `/camp`, `/rankings`, `/war-room/:teamId`에 `loading / empty / error` 분기를 정리
+  - 로컬 데이터 로드 후 타입이 맞지 않거나 후처리 중 예외가 나면 `ErrorState`로 수렴
+  - 데이터는 정상 로드됐지만 표시 대상이 비어 있을 때는 `EmptyState`를 유지
+- Validation:
+  - `npm run lint` passed
+  - `npm run build` passed
+
+## 2026-03-11 Addendum - Hackathon List and War Room UX Polish
+
+- `/hackathons`
+  - 목록 정렬을 전체 화면 공통으로 `upcoming -> ongoing -> ended` 우선순위로 고정
+  - 동일 상태 내부에서는 기존 데이터 순서를 유지
+  - 상태 필터와 함께 동작하는 태그 필터 추가
+  - 모바일은 `<select>`, 데스크톱은 버튼 행으로 태그 탐색 보강
+  - 모바일 카드에서 팀 수, 제목, 요약, 날짜, 태그 줄바꿈과 간격 조정
+- `/war-room/:teamId`
+  - 워크플로 카드, 체크리스트, 링크에 즉시 삭제 버튼 추가
+  - 삭제 시 화면 상태와 `localStorage` 컬렉션이 함께 갱신되도록 동기화
+  - 카드 삭제 후 컬럼 내 `order`를 재정렬해 드래그/이동 순서를 안정적으로 유지
+  - 링크 입력 placeholder를 `라벨`에서 `링크 이름`으로 변경
+  - 모바일에서 워크플로 설명, 카드 제목, 체크리스트, 링크 목록 줄바꿈과 액션 버튼 간격 보강
+- `/rankings`
+  - 모바일 전용 레이아웃에서 `#rank`, 닉네임, 점수 간격을 분리
+  - 활동 요약은 모바일에서 다음 줄로 내려 읽기 쉽게 조정
+- `/camp`, `/hackathons/:slug`
+  - `lookingFor[]` 모집 역할을 동일한 칩 스타일로 통일
+  - 상세 팀 섹션의 `#역할명` 접두사 제거
+  - 모바일 줄바꿈과 칩 간격 보강
+  - RECRUIT HUB 생성 폼에 기본 역할 선택 + 직접 입력 + 제거 UI 추가
+- Validation:
+  - `npm run lint` passed
+  - `npm run build` passed
+
 ## 2026-03-10 Addendum - UI Polish: Dark Card, Filter, Typography
 
 - Camp 페이지 필터 UI 개선:
@@ -103,7 +144,7 @@
   - `npm run lint` passed
   - `npm run build` passed
 
-Last Updated: 2026-03-10 (KST)
+Last Updated: 2026-03-11 (KST)
 Focus Hackathon: `daker-handover-2026-03`
 Product: `Expedition Hub`
 

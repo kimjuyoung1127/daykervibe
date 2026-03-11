@@ -1,6 +1,6 @@
 # Expedition Hub Master Plan
 
-기준일: 2026-03-10 (KST)
+기준일: 2026-03-11 (KST)
 프로젝트: Expedition Hub 해커톤 운영 포털
 
 ## 1) 현재 상태
@@ -8,6 +8,10 @@
 - 핵심 6개 라우트 구현 완료
 - 공개 포털 흐름 구현 완료
 - `/camp?hackathon=:slug` 해커톤 스코프 흐름 구현 완료
+- `/camp` 생성/수정 폼 정합성 보강 완료:
+  - `isOpen` 직접 입력
+  - 커스텀 팀 전용 수정
+  - 커스텀 팀 전용 모집 마감
 - `/war-room/:teamId` 작전실 진입 흐름 구현 완료
 - `/war-room/:teamId` 내부 기능 구현 완료:
   - 베이스캠프
@@ -21,6 +25,10 @@
   - TEAM MEMBERS 역할 칩 (roleLabel, team-local only)
 - 반응형 1차 QA 및 수정 완료
 - 공개/팀 로컬 프라이버시 경계 검증 완료
+- 핵심 6개 라우트 공통 상태 UI 정합성 보강 완료:
+  - loading
+  - empty
+  - error
 - 데스크톱 수동 drag sanity pass 완료
 - 에셋 로딩 최적화 완료:
   - 이미지 webp 파생본 + responsive sizes
@@ -58,6 +66,7 @@
 ## 5) 현재 판단
 
 - 제품 핵심 기능은 이미 제출 가능한 수준까지 올라와 있다.
+- SSOT 기준에서 남는 핵심 리스크는 기능 누락보다 실기기 검증과 제출 증빙이다.
 - 지금 남은 일의 성격은 대규모 구현보다:
   - 실기기 확인
   - 문안 정리

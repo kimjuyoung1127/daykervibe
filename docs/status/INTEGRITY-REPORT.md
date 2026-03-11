@@ -1,6 +1,6 @@
 # Integrity Report
 
-Last Run: 2026-03-10 KST
+Last Run: 2026-03-11 KST
 Result: pass with follow-up items
 
 ## Summary
@@ -15,6 +15,7 @@ Result: pass with follow-up items
 - Daily log structure present: yes
 - README visual entrypoint aligned: yes
 - Remaining stale docs: limited
+- Document consistency re-check completed: yes
 
 ## Route Coverage
 
@@ -31,6 +32,10 @@ Result: pass with follow-up items
   - `/hackathons/:slug` -> `/camp?hackathon=:slug`
   - `/camp` -> `/war-room/:teamId`
   - detail team cards -> `/war-room/:teamId`
+- `/camp` CRUD now matches the documented baseline more closely:
+  - create/edit form shares the same UI
+  - `isOpen` is user-selectable in the form
+  - only custom local teams expose `수정` and `모집 마감`
 - War-room workflow movement is now aligned with product docs:
   - desktop drag-and-drop verified
   - mobile fallback move controls verified
@@ -38,6 +43,10 @@ Result: pass with follow-up items
   - no `ownerLabel`
   - no `isPrivateProfile`
   - no team-local checklist / notes / artifact links on public pages
+- Common state UI coverage is aligned across the core 6 routes:
+  - loading
+  - empty
+  - error
 
 ## Validation Snapshot
 
@@ -47,6 +56,20 @@ Result: pass with follow-up items
 - Playwright privacy boundary evidence created
 - Manual desktop pointer drag sanity pass completed by the operator
 - Real-device phone pass not completed yet
+
+## 2026-03-11 Addendum - Self Review and Document Consistency
+
+- Self-review focus:
+  - `/camp` CRUD vs SSOT
+  - common state UI coverage vs PRD
+  - stale derived-doc references after asset cleanup
+- Result:
+  - no new SSOT conflict found in the current implementation patch
+  - one document-consistency issue was found and corrected:
+    - `docs/wireframe.md` still referenced removed `public/design_reference/*` assets
+    - wireframe references now point to live routes and current evidence docs
+  - wireframe typography references were refreshed to the current `.woff2` delivery baseline
+  - `ai-context/master-plan.md` was refreshed to the current implementation state
 
 ## Remaining Follow-up
 

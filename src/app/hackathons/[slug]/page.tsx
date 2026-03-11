@@ -12,6 +12,7 @@ import SectionTabs from '@/components/hackathon/SectionTabs';
 import SummaryBar from '@/components/hackathon/SummaryBar';
 import PageShell from '@/components/layout/PageShell';
 import ErrorState from '@/components/ui/ErrorState';
+import EmptyState from '@/components/ui/EmptyState';
 import LoadingState from '@/components/ui/LoadingState';
 
 export default function HackathonDetailPage() {
@@ -21,23 +22,42 @@ export default function HackathonDetailPage() {
   const [hackathon, setHackathon] = useState<Hackathon | null | undefined>(undefined);
   const [teamCountOverride, setTeamCountOverride] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<HackathonSectionType>('overview');
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     queueMicrotask(() => {
       if (cancelled) return;
+      try {
+        const allHackathons = getItem<Hackathon[]>(STORAGE_KEYS.HACKATHONS);
+        const allTeams = getItem<Team[]>(STORAGE_KEYS.TEAMS);
 
-      const allHackathons = getItem<Hackathon[]>(STORAGE_KEYS.HACKATHONS) ?? [];
-      const foundHackathon = allHackathons.find(entry => entry.slug === slug) ?? null;
-      setHackathon(foundHackathon);
+        if (allHackathons !== null && !Array.isArray(allHackathons)) {
+          throw new Error('해커톤 상세 데이터를 불러오지 못했습니다.');
+        }
 
-      const allTeams = getItem<Team[]>(STORAGE_KEYS.TEAMS) ?? [];
-      setTeamCountOverride(allTeams.filter(team => team.hackathonSlug === slug).length);
+        if (allTeams !== null && !Array.isArray(allTeams)) {
+          throw new Error('팀 데이터를 불러오지 못했습니다.');
+        }
 
-      if (foundHackathon) {
-        const sections = getHackathonSectionsWithFallback(foundHackathon);
-        setActiveTab(sections[0]?.type ?? 'overview');
+        const foundHackathon = (allHackathons ?? []).find(entry => entry.slug === slug) ?? null;
+        setHackathon(foundHackathon);
+
+        setTeamCountOverride((allTeams ?? []).filter(team => team.hackathonSlug === slug).length);
+
+        if (foundHackathon) {
+          const sections = getHackathonSectionsWithFallback(foundHackathon);
+          setActiveTab(sections[0]?.type ?? 'overview');
+        }
+
+        setLoadError(null);
+      } catch (error) {
+        setHackathon(null);
+        setTeamCountOverride(null);
+        setLoadError(
+          error instanceof Error ? error.message : '해커톤 상세 데이터를 불러오지 못했습니다.',
+        );
       }
     });
 
@@ -62,6 +82,13 @@ export default function HackathonDetailPage() {
   );
 
   if (hackathon === undefined) return <LoadingState />;
+  if (loadError) {
+    return (
+      <PageShell>
+        <ErrorState message={loadError} />
+      </PageShell>
+    );
+  }
 
   if (hackathon === null || !normalizedHackathon) {
     return (
@@ -74,6 +101,14 @@ export default function HackathonDetailPage() {
   const sectionTypes = sectionCatalog.map(section => section.type);
   const activeSection =
     sectionCatalog.find(section => section.type === activeTab) ?? sectionCatalog[0];
+
+  if (sectionCatalog.length === 0 || !activeSection) {
+    return (
+      <PageShell>
+        <EmptyState message="해커톤 상세 섹션이 없습니다." />
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell>

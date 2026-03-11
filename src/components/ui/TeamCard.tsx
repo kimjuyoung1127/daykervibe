@@ -11,6 +11,10 @@ interface TeamCardProps {
   isEnded?: boolean;
   /** Hackathon list for resolving hackathon title (camp variant) */
   hackathons?: Hackathon[];
+  /** Custom local teams in camp can expose edit actions */
+  canEdit?: boolean;
+  onEdit?: () => void;
+  onCloseRecruitment?: () => void;
 }
 
 export default function TeamCard({
@@ -18,15 +22,38 @@ export default function TeamCard({
   variant = 'camp',
   isEnded = false,
   hackathons,
+  canEdit = false,
+  onEdit,
+  onCloseRecruitment,
 }: TeamCardProps) {
   if (variant === 'detail') {
     return <DetailTeamCard team={team} isEnded={isEnded} />;
   }
 
-  return <CampTeamCard team={team} hackathons={hackathons ?? []} />;
+  return (
+    <CampTeamCard
+      team={team}
+      hackathons={hackathons ?? []}
+      canEdit={canEdit}
+      onEdit={onEdit}
+      onCloseRecruitment={onCloseRecruitment}
+    />
+  );
 }
 
-function CampTeamCard({ team, hackathons }: { team: Team; hackathons: Hackathon[] }) {
+function CampTeamCard({
+  team,
+  hackathons,
+  canEdit,
+  onEdit,
+  onCloseRecruitment,
+}: {
+  team: Team;
+  hackathons: Hackathon[];
+  canEdit: boolean;
+  onEdit?: () => void;
+  onCloseRecruitment?: () => void;
+}) {
   const hackathon = hackathons.find(item => item.slug === team.hackathonSlug);
   const hasContact = team.isOpen && isValidPublicContactUrl(team.contactUrl);
 
@@ -54,11 +81,11 @@ function CampTeamCard({ team, hackathons }: { team: Team; hackathons: Hackathon[
       <p className="mb-3 font-dunggeunmo text-sm text-card-white/70">{team.intro}</p>
 
       {team.lookingFor.length > 0 && (
-        <div className="mb-3 flex flex-wrap gap-1">
+        <div className="mb-3 flex flex-wrap gap-1.5">
           {team.lookingFor.map(role => (
             <span
               key={role}
-              className="border border-accent-yellow/40 bg-accent-yellow/20 px-2 py-0.5 font-pixel text-[8px] text-accent-orange"
+              className="inline-flex max-w-full items-center border border-accent-yellow/40 bg-accent-yellow/18 px-2.5 py-1 font-dunggeunmo text-xs font-bold leading-tight text-accent-orange break-words"
             >
               {role}
             </span>
@@ -69,6 +96,20 @@ function CampTeamCard({ team, hackathons }: { team: Team; hackathons: Hackathon[
       <div className="mt-auto flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
         <span className="font-dunggeunmo text-xs text-card-white/50">{team.memberCount}명</span>
         <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
+          {canEdit && onEdit && (
+            <PixelButton onClick={onEdit} variant="ghost" className="px-3 py-2 text-[8px]">
+              수정
+            </PixelButton>
+          )}
+          {canEdit && team.isOpen && onCloseRecruitment && (
+            <PixelButton
+              onClick={onCloseRecruitment}
+              variant="ghost"
+              className="px-3 py-2 text-[8px]"
+            >
+              모집 마감
+            </PixelButton>
+          )}
           <PixelButton
             href={`/war-room/${team.id}`}
             variant="ghost"
@@ -124,13 +165,13 @@ function DetailTeamCard({ team, isEnded }: { team: Team; isEnded: boolean }) {
       </div>
       <p className="mb-2 font-dunggeunmo text-xs text-dark-bg/70">{team.intro}</p>
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {team.lookingFor.map(role => (
             <span
               key={role}
-              className="border border-accent-yellow/35 bg-accent-yellow/18 px-1.5 py-0.5 font-pixel text-[7px] text-dark-bg/80"
+              className="inline-flex max-w-full items-center border border-accent-yellow/40 bg-accent-yellow/18 px-2.5 py-1 font-dunggeunmo text-xs font-bold leading-tight text-dark-bg break-words"
             >
-              #{role}
+              {role}
             </span>
           ))}
         </div>

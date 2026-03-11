@@ -9,9 +9,32 @@ import type { Hackathon, Team } from '@/lib/types';
 import PageShell from '@/components/layout/PageShell';
 import Card from '@/components/ui/Card';
 import EmptyState from '@/components/ui/EmptyState';
+import ErrorState from '@/components/ui/ErrorState';
 import LoadingState from '@/components/ui/LoadingState';
 import PixelButton from '@/components/ui/PixelButton';
 import TeamCard from '@/components/ui/TeamCard';
+import rawTeams from '../../../hackathonsjson/public_teams.json';
+
+const RECRUIT_ROLE_OPTIONS = [
+  'Frontend',
+  'Backend',
+  'Designer',
+  'PM',
+  'AI',
+  'Full Stack',
+];
+
+function normalizeRoleLabel(value: string): string {
+  return value.trim().replace(/\s+/g, ' ');
+}
+
+function hasRole(roles: string[], candidate: string): boolean {
+  return roles.some(role => role.toLowerCase() === candidate.toLowerCase());
+}
+
+const PUBLIC_TEAM_IDS = new Set(
+  (rawTeams as { teamCode: string }[]).map(team => team.teamCode),
+);
 
 export default function CampPage() {
   return (
@@ -27,11 +50,15 @@ function CampPageContent() {
   const searchParams = useSearchParams();
   const [teams, setTeams] = useState<Team[] | null>(null);
   const [hackathons, setHackathons] = useState<Hackathon[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
   const [formName, setFormName] = useState('');
   const [formIntro, setFormIntro] = useState('');
   const [formHackathon, setFormHackathon] = useState('');
-  const [formLookingFor, setFormLookingFor] = useState('');
+  const [formIsOpen, setFormIsOpen] = useState(true);
+  const [formLookingFor, setFormLookingFor] = useState<string[]>([]);
+  const [customRoleInput, setCustomRoleInput] = useState('');
   const [formContact, setFormContact] = useState('');
   const filter = searchParams.get('hackathon')?.trim() || 'all';
 
@@ -41,11 +68,28 @@ function CampPageContent() {
     queueMicrotask(() => {
       if (cancelled) return;
 
-      const storedTeams = getItem<Team[]>(STORAGE_KEYS.TEAMS);
-      const storedHackathons = getItem<Hackathon[]>(STORAGE_KEYS.HACKATHONS);
+      try {
+        const storedTeams = getItem<Team[]>(STORAGE_KEYS.TEAMS);
+        const storedHackathons = getItem<Hackathon[]>(STORAGE_KEYS.HACKATHONS);
 
-      setTeams(storedTeams ?? []);
-      setHackathons(storedHackathons ?? []);
+        if (storedTeams !== null && !Array.isArray(storedTeams)) {
+          throw new Error('팀 데이터 형식이 올바르지 않습니다.');
+        }
+
+        if (storedHackathons !== null && !Array.isArray(storedHackathons)) {
+          throw new Error('해커톤 데이터 형식이 올바르지 않습니다.');
+        }
+
+        setTeams(storedTeams ?? []);
+        setHackathons(storedHackathons ?? []);
+        setLoadError(null);
+      } catch (error) {
+        setTeams([]);
+        setHackathons([]);
+        setLoadError(
+          error instanceof Error ? error.message : '원정대 데이터를 불러오지 못했습니다.',
+        );
+      }
     });
 
     return () => {
@@ -60,11 +104,33 @@ function CampPageContent() {
   );
 
   if (teams === null) return <LoadingState />;
+  if (loadError) {
+    return (
+      <PageShell>
+        <ErrorState message={loadError} />
+      </PageShell>
+    );
+  }
 
   const filteredTeams =
     filter === 'all' ? teams : teams.filter(team => team.hackathonSlug === filter);
   const openTeams = filteredTeams.filter(team => team.isOpen);
   const closedTeams = filteredTeams.filter(team => !team.isOpen);
+
+  function resetForm() {
+    setFormName('');
+    setFormIntro('');
+    setFormHackathon('');
+    setFormIsOpen(true);
+    setFormLookingFor([]);
+    setCustomRoleInput('');
+    setFormContact('');
+    setEditingTeamId(null);
+  }
+
+  function isEditableCustomTeam(team: Team): boolean {
+    return !PUBLIC_TEAM_IDS.has(team.id);
+  }
 
   function handleFilterChange(nextFilter: string) {
     const nextSearchParams = new URLSearchParams(searchParams.toString());
@@ -79,35 +145,94 @@ function CampPageContent() {
     router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
   }
 
-  function handleCreate() {
+  function handleSubmitTeam() {
     if (!formName.trim()) return;
 
     const currentTeams = teams ?? [];
-    const newTeam: Team = {
-      id: `T-${Date.now()}`,
-      hackathonSlug: formHackathon || undefined,
-      name: formName.trim(),
-      intro: formIntro.trim(),
-      isOpen: true,
-      lookingFor: formLookingFor
-        .split(',')
-        .map(role => role.trim())
-        .filter(Boolean),
-      contactUrl: formContact.trim() || undefined,
-      memberCount: 1,
-      createdAt: new Date().toISOString(),
-    };
+    const timestamp = new Date().toISOString();
+    const updatedTeams = editingTeamId
+      ? currentTeams.map(team =>
+          team.id === editingTeamId
+            ? {
+                ...team,
+                hackathonSlug: formHackathon || undefined,
+                name: formName.trim(),
+                intro: formIntro.trim(),
+                isOpen: formIsOpen,
+                lookingFor: formLookingFor,
+                contactUrl: formContact.trim() || undefined,
+                updatedAt: timestamp,
+              }
+            : team,
+        )
+      : [
+          ...currentTeams,
+          {
+            id: `T-${Date.now()}`,
+            hackathonSlug: formHackathon || undefined,
+            name: formName.trim(),
+            intro: formIntro.trim(),
+            isOpen: formIsOpen,
+            lookingFor: formLookingFor,
+            contactUrl: formContact.trim() || undefined,
+            memberCount: 1,
+            createdAt: timestamp,
+          },
+        ];
 
-    const updatedTeams = [...currentTeams, newTeam];
     setTeams(updatedTeams);
     setItem(STORAGE_KEYS.TEAMS, updatedTeams);
 
-    setFormName('');
-    setFormIntro('');
-    setFormHackathon('');
-    setFormLookingFor('');
-    setFormContact('');
+    resetForm();
     setShowForm(false);
+  }
+
+  function handleEditTeam(team: Team) {
+    if (!isEditableCustomTeam(team)) return;
+
+    setEditingTeamId(team.id);
+    setFormName(team.name);
+    setFormIntro(team.intro);
+    setFormHackathon(team.hackathonSlug ?? '');
+    setFormIsOpen(team.isOpen);
+    setFormLookingFor(team.lookingFor);
+    setCustomRoleInput('');
+    setFormContact(team.contactUrl ?? '');
+    setShowForm(true);
+  }
+
+  function handleCloseRecruitment(teamId: string) {
+    const updatedTeams = (teams ?? []).map(team =>
+      team.id === teamId ? { ...team, isOpen: false, updatedAt: new Date().toISOString() } : team,
+    );
+
+    setTeams(updatedTeams);
+    setItem(STORAGE_KEYS.TEAMS, updatedTeams);
+  }
+
+  function toggleRole(role: string) {
+    setFormLookingFor(current =>
+      hasRole(current, role)
+        ? current.filter(entry => entry.toLowerCase() !== role.toLowerCase())
+        : [...current, role],
+    );
+  }
+
+  function addCustomRole() {
+    const nextRole = normalizeRoleLabel(customRoleInput);
+    if (!nextRole || hasRole(formLookingFor, nextRole)) {
+      setCustomRoleInput('');
+      return;
+    }
+
+    setFormLookingFor(current => [...current, nextRole]);
+    setCustomRoleInput('');
+  }
+
+  function removeRole(role: string) {
+    setFormLookingFor(current =>
+      current.filter(entry => entry.toLowerCase() !== role.toLowerCase()),
+    );
   }
 
   return (
@@ -130,11 +255,15 @@ function CampPageContent() {
               setFormHackathon(filter);
             }
 
+            if (showForm) {
+              resetForm();
+            }
+
             setShowForm(!showForm);
           }}
           className="min-h-10"
         >
-          {showForm ? '닫기' : '+ 원정대 만들기'}
+          {showForm ? '닫기' : editingTeamId ? '원정대 수정' : '+ 원정대 만들기'}
         </PixelButton>
       </div>
 
@@ -149,7 +278,9 @@ function CampPageContent() {
 
       {showForm && (
         <Card hover={false} variant="dark" className="mb-6">
-          <h2 className="mb-4 font-pixel text-[10px] text-accent-yellow">NEW EXPEDITION</h2>
+          <h2 className="mb-4 font-pixel text-[10px] text-accent-yellow">
+            {editingTeamId ? 'EDIT EXPEDITION' : 'NEW EXPEDITION'}
+          </h2>
           <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="mb-1 block font-dunggeunmo text-xs text-card-white/70">
@@ -189,18 +320,91 @@ function CampPageContent() {
                 placeholder="팀 소개를 적어주세요."
               />
             </div>
-            <div>
+            <div className="sm:col-span-2">
               <label className="mb-1 block font-dunggeunmo text-xs text-card-white/70">
-                모집 역할 (콤마 구분)
+                모집 상태
               </label>
-              <input
-                value={formLookingFor}
-                onChange={event => setFormLookingFor(event.target.value)}
-                className="w-full border-2 border-dark-border bg-dark-bg px-3 py-2 font-dunggeunmo text-sm text-card-white"
-                placeholder="예: Frontend, Designer"
-              />
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFormIsOpen(true)}
+                  className={`min-h-10 border px-3 py-2 font-dunggeunmo text-xs font-bold transition-colors ${
+                    formIsOpen
+                      ? 'border-accent-mint bg-accent-mint/18 text-accent-mint'
+                      : 'border-dark-border bg-dark-bg text-card-white/70 hover:border-card-white/40'
+                  }`}
+                >
+                  모집중
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormIsOpen(false)}
+                  className={`min-h-10 border px-3 py-2 font-dunggeunmo text-xs font-bold transition-colors ${
+                    !formIsOpen
+                      ? 'border-card-white/30 bg-card-white/10 text-card-white'
+                      : 'border-dark-border bg-dark-bg text-card-white/70 hover:border-card-white/40'
+                  }`}
+                >
+                  모집 마감
+                </button>
+              </div>
             </div>
-            <div>
+            <div className="sm:col-span-2">
+              <label className="mb-1 block font-dunggeunmo text-xs text-card-white/70">
+                모집 역할
+              </label>
+              <p className="mb-2 font-dunggeunmo text-xs text-card-white/45">
+                기본 역할을 고르거나 직접 추가할 수 있습니다.
+              </p>
+              <div className="mb-3 flex flex-wrap gap-2">
+                {RECRUIT_ROLE_OPTIONS.map(role => {
+                  const isSelected = hasRole(formLookingFor, role);
+
+                  return (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => toggleRole(role)}
+                      className={`min-h-10 border px-3 py-2 font-dunggeunmo text-xs font-bold leading-tight transition-colors ${
+                        isSelected
+                          ? 'border-accent-orange bg-accent-orange/16 text-accent-orange'
+                          : 'border-dark-border bg-dark-bg text-card-white/70 hover:border-card-white/40'
+                      }`}
+                    >
+                      {role}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+                <input
+                  value={customRoleInput}
+                  onChange={event => setCustomRoleInput(event.target.value)}
+                  className="w-full border-2 border-dark-border bg-dark-bg px-3 py-2 font-dunggeunmo text-sm text-card-white"
+                  placeholder="직접 역할 추가"
+                  onKeyDown={event => event.key === 'Enter' && addCustomRole()}
+                />
+                <PixelButton onClick={addCustomRole} className="min-h-10">
+                  역할 추가
+                </PixelButton>
+              </div>
+              {formLookingFor.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {formLookingFor.map(role => (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => removeRole(role)}
+                      className="inline-flex min-h-9 max-w-full items-center gap-2 border border-accent-yellow/40 bg-accent-yellow/18 px-2.5 py-1 font-dunggeunmo text-xs font-bold leading-tight text-accent-orange"
+                    >
+                      <span className="break-words">{role}</span>
+                      <span className="font-pixel text-[8px] text-accent-pink">X</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="sm:col-span-2">
               <label className="mb-1 block font-dunggeunmo text-xs text-card-white/70">
                 연락 링크
               </label>
@@ -212,7 +416,20 @@ function CampPageContent() {
               />
             </div>
           </div>
-          <PixelButton onClick={handleCreate}>원정대 생성</PixelButton>
+          <div className="flex flex-wrap gap-2">
+            <PixelButton onClick={handleSubmitTeam}>
+              {editingTeamId ? '원정대 수정 저장' : '원정대 생성'}
+            </PixelButton>
+            <PixelButton
+              variant="ghost"
+              onClick={() => {
+                resetForm();
+                setShowForm(false);
+              }}
+            >
+              취소
+            </PixelButton>
+          </div>
         </Card>
       )}
 
@@ -274,7 +491,14 @@ function CampPageContent() {
               </h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {openTeams.map(team => (
-                  <TeamCard key={team.id} team={team} hackathons={hackathons} />
+                  <TeamCard
+                    key={team.id}
+                    team={team}
+                    hackathons={hackathons}
+                    canEdit={isEditableCustomTeam(team)}
+                    onEdit={() => handleEditTeam(team)}
+                    onCloseRecruitment={() => handleCloseRecruitment(team.id)}
+                  />
                 ))}
               </div>
             </div>
@@ -286,7 +510,13 @@ function CampPageContent() {
               </h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {closedTeams.map(team => (
-                  <TeamCard key={team.id} team={team} hackathons={hackathons} />
+                  <TeamCard
+                    key={team.id}
+                    team={team}
+                    hackathons={hackathons}
+                    canEdit={isEditableCustomTeam(team)}
+                    onEdit={() => handleEditTeam(team)}
+                  />
                 ))}
               </div>
             </div>
@@ -296,4 +526,3 @@ function CampPageContent() {
     </PageShell>
   );
 }
-

@@ -20,6 +20,7 @@ import type {
 } from '@/lib/types';
 import PageShell from '@/components/layout/PageShell';
 import Card from '@/components/ui/Card';
+import EmptyState from '@/components/ui/EmptyState';
 import ErrorState from '@/components/ui/ErrorState';
 import LoadingState from '@/components/ui/LoadingState';
 import PixelButton from '@/components/ui/PixelButton';
@@ -105,6 +106,7 @@ export default function WarRoomPage() {
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
   const [dragOverState, setDragOverState] = useState<DragOverState>(null);
   const [importedDraft, setImportedDraft] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const [newCardTitle, setNewCardTitle] = useState('');
   const [newCardColumn, setNewCardColumn] = useState<WorkflowColumn>('plan');
@@ -117,60 +119,93 @@ export default function WarRoomPage() {
 
     queueMicrotask(() => {
       if (cancelled) return;
+      try {
+        const allTeams = getItem<Team[]>(STORAGE_KEYS.TEAMS);
+        const allHackathons = getItem<Hackathon[]>(STORAGE_KEYS.HACKATHONS);
+        const allMembers = getItem<TeamMember[]>(STORAGE_KEYS.TEAM_MEMBERS);
+        const allWarRooms = getItem<WarRoom[]>(STORAGE_KEYS.WAR_ROOMS);
+        const allCards = getItem<WarRoomWorkflowCard[]>(STORAGE_KEYS.WAR_ROOM_WORKFLOW_CARDS);
+        const allChecks = getItem<WarRoomChecklistItem[]>(STORAGE_KEYS.WAR_ROOM_CHECKLIST);
+        const allSubmissions = getItem<Submission[]>(STORAGE_KEYS.SUBMISSIONS);
+        const allArtifacts = getItem<SubmissionArtifact[]>(STORAGE_KEYS.SUBMISSION_ARTIFACTS);
 
-      const allTeams = getItem<Team[]>(STORAGE_KEYS.TEAMS) ?? [];
-      const currentTeam = allTeams.find(entry => entry.id === teamId) ?? null;
-      setTeam(currentTeam);
+        const datasets = [
+          { value: allTeams, label: '팀' },
+          { value: allHackathons, label: '해커톤' },
+          { value: allMembers, label: '팀 멤버' },
+          { value: allWarRooms, label: '작전실' },
+          { value: allCards, label: '워크플로 카드' },
+          { value: allChecks, label: '체크리스트' },
+          { value: allSubmissions, label: '제출' },
+          { value: allArtifacts, label: '링크' },
+        ];
 
-      if (!currentTeam) {
+        for (const dataset of datasets) {
+          if (dataset.value !== null && !Array.isArray(dataset.value)) {
+            throw new Error(`${dataset.label} 데이터를 불러오지 못했습니다.`);
+          }
+        }
+
+        const currentTeam = (allTeams ?? []).find(entry => entry.id === teamId) ?? null;
+        setTeam(currentTeam);
+
+        if (!currentTeam) {
+          setLoading(false);
+          setLoadError(null);
+          return;
+        }
+
+        const didImportDraft = applyPendingSubmitDraftToTeam(currentTeam);
+        setImportedDraft(didImportDraft);
+
+        if (currentTeam.hackathonSlug) {
+          setHackathon(
+            (allHackathons ?? []).find(entry => entry.slug === currentTeam.hackathonSlug) ?? null,
+          );
+        } else {
+          setHackathon(null);
+        }
+
+        setMembers((allMembers ?? []).filter(member => member.teamId === teamId));
+
+        const currentWarRoom = (allWarRooms ?? []).find(entry => entry.teamId === teamId) ?? null;
+        setWarRoom(currentWarRoom);
+
+        if (currentWarRoom) {
+          setCards(
+            normalizeWorkflowCards(
+              (allCards ?? []).filter(card => card.warRoomId === currentWarRoom.id),
+            ),
+          );
+
+          setChecklist(
+            (allChecks ?? []).filter(item => item.warRoomId === currentWarRoom.id),
+          );
+        } else {
+          setCards([]);
+          setChecklist([]);
+        }
+
+        const currentSubmission =
+          (allSubmissions ?? []).find(entry => entry.teamId === teamId) ?? null;
+        setSubmissionId(currentSubmission?.id ?? null);
+
+        setArtifacts(
+          currentSubmission
+            ? (allArtifacts ?? []).filter(
+                artifact => artifact.submissionId === currentSubmission.id,
+              )
+            : [],
+        );
+
+        setLoadError(null);
         setLoading(false);
-        return;
-      }
-
-      const didImportDraft = applyPendingSubmitDraftToTeam(currentTeam);
-      setImportedDraft(didImportDraft);
-
-      if (currentTeam.hackathonSlug) {
-        const allHackathons = getItem<Hackathon[]>(STORAGE_KEYS.HACKATHONS) ?? [];
-        setHackathon(
-          allHackathons.find(entry => entry.slug === currentTeam.hackathonSlug) ?? null,
+      } catch (error) {
+        setLoadError(
+          error instanceof Error ? error.message : '작전실 데이터를 불러오지 못했습니다.',
         );
-      } else {
-        setHackathon(null);
+        setLoading(false);
       }
-
-      const allMembers = getItem<TeamMember[]>(STORAGE_KEYS.TEAM_MEMBERS) ?? [];
-      setMembers(allMembers.filter(member => member.teamId === teamId));
-
-      const allWarRooms = getItem<WarRoom[]>(STORAGE_KEYS.WAR_ROOMS) ?? [];
-      const currentWarRoom = allWarRooms.find(entry => entry.teamId === teamId) ?? null;
-      setWarRoom(currentWarRoom);
-
-      if (currentWarRoom) {
-        const allCards = getItem<WarRoomWorkflowCard[]>(STORAGE_KEYS.WAR_ROOM_WORKFLOW_CARDS) ?? [];
-        setCards(
-          normalizeWorkflowCards(allCards.filter(card => card.warRoomId === currentWarRoom.id)),
-        );
-
-        const allChecks = getItem<WarRoomChecklistItem[]>(STORAGE_KEYS.WAR_ROOM_CHECKLIST) ?? [];
-        setChecklist(allChecks.filter(item => item.warRoomId === currentWarRoom.id));
-      } else {
-        setCards([]);
-        setChecklist([]);
-      }
-
-      const allSubmissions = getItem<Submission[]>(STORAGE_KEYS.SUBMISSIONS) ?? [];
-      const currentSubmission = allSubmissions.find(entry => entry.teamId === teamId) ?? null;
-      setSubmissionId(currentSubmission?.id ?? null);
-
-      const allArtifacts = getItem<SubmissionArtifact[]>(STORAGE_KEYS.SUBMISSION_ARTIFACTS) ?? [];
-      setArtifacts(
-        currentSubmission
-          ? allArtifacts.filter(artifact => artifact.submissionId === currentSubmission.id)
-          : [],
-      );
-
-      setLoading(false);
     });
 
     return () => {
@@ -179,6 +214,7 @@ export default function WarRoomPage() {
   }, [teamId]);
 
   if (loading) return <LoadingState />;
+  if (loadError) return <ErrorState message={loadError} />;
   if (!team) return <ErrorState message={`팀 "${teamId}"을 찾을 수 없습니다.`} />;
 
   const currentTeam = team;
@@ -330,6 +366,10 @@ export default function WarRoomPage() {
     setNewCardTitle('');
   }
 
+  function handleDeleteCard(cardId: string) {
+    persistWorkflowCards(cards.filter(card => card.id !== cardId));
+  }
+
   function handleToggleCheck(id: string) {
     const statusOrder = ['todo', 'doing', 'done'] as const;
     const updated = checklist.map(item => {
@@ -365,6 +405,17 @@ export default function WarRoomPage() {
     setNewCheckLabel('');
   }
 
+  function handleDeleteCheckItem(id: string) {
+    const nextChecklist = checklist.filter(item => item.id !== id);
+    const allChecks = getItem<WarRoomChecklistItem[]>(STORAGE_KEYS.WAR_ROOM_CHECKLIST) ?? [];
+
+    setChecklist(nextChecklist);
+    setItem(
+      STORAGE_KEYS.WAR_ROOM_CHECKLIST,
+      allChecks.filter(item => item.id !== id),
+    );
+  }
+
   function handleAddLink() {
     const nextUrl = newLinkUrl.trim();
     if (!nextUrl || !isHttpUrl(nextUrl)) return;
@@ -383,6 +434,17 @@ export default function WarRoomPage() {
     setItem(STORAGE_KEYS.SUBMISSION_ARTIFACTS, [...allArtifacts, newArtifact]);
     setNewLinkUrl('');
     setNewLinkLabel('');
+  }
+
+  function handleDeleteLink(id: string) {
+    const nextArtifacts = artifacts.filter(artifact => artifact.id !== id);
+    const allArtifacts = getItem<SubmissionArtifact[]>(STORAGE_KEYS.SUBMISSION_ARTIFACTS) ?? [];
+
+    setArtifacts(nextArtifacts);
+    setItem(
+      STORAGE_KEYS.SUBMISSION_ARTIFACTS,
+      allArtifacts.filter(artifact => artifact.id !== id),
+    );
   }
 
   function resolveDraggedCardId(event?: DragEvent<HTMLDivElement>): string | null {
@@ -559,13 +621,18 @@ export default function WarRoomPage() {
           style={tacticalMapStyle}
         />
         <div className="relative z-10">
-          <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <h2 className="font-pixel text-[10px] text-card-white/50">WORKFLOW BOARD</h2>
-            <span className="font-dunggeunmo text-xs text-card-white/40">
+            <span className="max-w-xl break-words font-dunggeunmo text-xs leading-snug text-card-white/40">
               데스크톱에서는 드래그, 모바일에서는 이동 버튼을 사용할 수 있습니다.
             </span>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {cards.length === 0 && (
+              <div className="lg:col-span-4">
+                <EmptyState message="아직 등록된 워크플로 카드가 없습니다." />
+              </div>
+            )}
             {COLUMNS.map(column => {
               const columnCards = getColumnCards(column.key);
               const isColumnActive = dragOverState?.column === column.key;
@@ -612,13 +679,27 @@ export default function WarRoomPage() {
                               } ${draggedCardId === card.id ? 'opacity-60 ring-1 ring-accent-orange/70' : ''
                               }`}
                           >
-                            <div className="cursor-grab active:cursor-grabbing">
-                              {card.title}
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 cursor-grab active:cursor-grabbing">
+                                <p className="break-words leading-snug">{card.title}</p>
                               {card.ownerLabel && (
-                                <span className="mt-0.5 block text-[10px] text-card-white/40">
+                                <span className="mt-0.5 block break-words text-[10px] leading-snug text-card-white/40">
                                   {card.ownerLabel}
                                 </span>
                               )}
+                              </div>
+                              <button
+                                type="button"
+                                draggable={false}
+                                onClick={event => {
+                                  event.stopPropagation();
+                                  handleDeleteCard(card.id);
+                                }}
+                                className="min-h-9 shrink-0 border border-accent-pink/40 px-2 py-1 font-pixel text-[8px] text-accent-pink transition-colors hover:bg-accent-pink/10"
+                                aria-label={`카드 ${card.title} 삭제`}
+                              >
+                                삭제
+                              </button>
                             </div>
 
                             <div className="mt-2 flex flex-wrap gap-1 sm:hidden">
@@ -626,7 +707,7 @@ export default function WarRoomPage() {
                                 type="button"
                                 disabled={!canMovePrevColumn}
                                 onClick={() => moveCardByControls(card.id, 'prev-column')}
-                                className="min-h-9 min-w-16 border border-dark-border px-2 py-1 font-pixel text-[8px] text-card-white/70 disabled:cursor-not-allowed disabled:opacity-30"
+                                className="min-h-9 min-w-16 border border-dark-border px-2 py-1 font-pixel text-[8px] text-card-white/70 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
                               >
                                 이전 컬럼
                               </button>
@@ -634,7 +715,7 @@ export default function WarRoomPage() {
                                 type="button"
                                 disabled={!canMoveNextColumn}
                                 onClick={() => moveCardByControls(card.id, 'next-column')}
-                                className="min-h-9 min-w-16 border border-dark-border px-2 py-1 font-pixel text-[8px] text-card-white/70 disabled:cursor-not-allowed disabled:opacity-30"
+                                className="min-h-9 min-w-16 border border-dark-border px-2 py-1 font-pixel text-[8px] text-card-white/70 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
                               >
                                 다음 컬럼
                               </button>
@@ -642,7 +723,7 @@ export default function WarRoomPage() {
                                 type="button"
                                 disabled={isFirstCard}
                                 onClick={() => moveCardByControls(card.id, 'up')}
-                                className="min-h-9 min-w-12 border border-dark-border px-2 py-1 font-pixel text-[8px] text-card-white/70 disabled:cursor-not-allowed disabled:opacity-30"
+                                className="min-h-9 min-w-12 border border-dark-border px-2 py-1 font-pixel text-[8px] text-card-white/70 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
                               >
                                 위로
                               </button>
@@ -650,7 +731,7 @@ export default function WarRoomPage() {
                                 type="button"
                                 disabled={isLastCard}
                                 onClick={() => moveCardByControls(card.id, 'down')}
-                                className="min-h-9 min-w-12 border border-dark-border px-2 py-1 font-pixel text-[8px] text-card-white/70 disabled:cursor-not-allowed disabled:opacity-30"
+                                className="min-h-9 min-w-12 border border-dark-border px-2 py-1 font-pixel text-[8px] text-card-white/70 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
                               >
                                 아래로
                               </button>
@@ -696,37 +777,52 @@ export default function WarRoomPage() {
           <h2 className="mb-3 font-pixel text-[10px] text-card-white/50">CHECKLIST</h2>
           <div className="border-2 border-dark-border p-3">
             {checklist.length === 0 ? (
-              <p className="font-dunggeunmo text-sm text-card-white/40">체크리스트가 비어 있습니다.</p>
+              <EmptyState message="체크리스트가 비어 있습니다." />
             ) : (
               <div className="space-y-2">
                 {checklist.map(item => (
-                  <button
+                  <div
                     key={item.id}
-                    onClick={() => handleToggleCheck(item.id)}
-                    className="flex min-h-10 w-full items-start gap-2 px-2 py-2 text-left transition-colors hover:bg-card-white/5 sm:items-center"
+                    className="flex min-h-10 flex-col gap-2 px-2 py-2 transition-colors hover:bg-card-white/5 sm:flex-row sm:items-center"
                   >
-                    <span
-                      className={`w-12 font-pixel text-[10px] ${item.status === 'done'
-                        ? 'text-accent-mint'
-                        : item.status === 'doing'
-                          ? 'text-accent-yellow'
-                          : 'text-card-white/40'
-                        }`}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleCheck(item.id)}
+                      className="flex min-w-0 flex-1 items-start gap-2 text-left sm:items-center"
                     >
-                      {item.status === 'done' ? '[v]' : item.status === 'doing' ? '[~]' : '[ ]'}
-                    </span>
-                    <span
-                      className={`min-w-0 font-dunggeunmo text-sm ${item.status === 'done' ? 'line-through text-card-white/40' : 'text-card-white'
-                        }`}
-                    >
-                      {item.label}
-                    </span>
-                    {item.assigneeLabel && (
-                      <span className="ml-auto font-dunggeunmo text-[10px] text-card-white/30">
-                        {item.assigneeLabel}
+                      <span
+                        className={`w-12 shrink-0 font-pixel text-[10px] ${item.status === 'done'
+                          ? 'text-accent-mint'
+                          : item.status === 'doing'
+                            ? 'text-accent-yellow'
+                            : 'text-card-white/40'
+                          }`}
+                      >
+                        {item.status === 'done' ? '[v]' : item.status === 'doing' ? '[~]' : '[ ]'}
                       </span>
-                    )}
-                  </button>
+                      <span
+                        className={`min-w-0 break-words font-dunggeunmo text-sm leading-snug ${item.status === 'done' ? 'line-through text-card-white/40' : 'text-card-white'
+                          }`}
+                      >
+                        {item.label}
+                      </span>
+                    </button>
+                    <div className="flex items-center justify-between gap-2 sm:ml-auto sm:justify-end">
+                      {item.assigneeLabel && (
+                        <span className="break-words font-dunggeunmo text-[10px] leading-snug text-card-white/30">
+                          {item.assigneeLabel}
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCheckItem(item.id)}
+                        className="min-h-9 shrink-0 border border-accent-pink/40 px-2 py-1 font-pixel text-[8px] text-accent-pink transition-colors hover:bg-accent-pink/10"
+                        aria-label={`체크리스트 ${item.label} 삭제`}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
@@ -762,25 +858,35 @@ export default function WarRoomPage() {
         <h2 className="mb-3 font-pixel text-[10px] text-card-white/50">LINKS</h2>
         <div className="border-2 border-dark-border p-3">
           {artifacts.length === 0 ? (
-            <p className="mb-3 font-dunggeunmo text-sm text-card-white/40">등록된 링크가 없습니다.</p>
+            <EmptyState message="등록된 링크가 없습니다." />
           ) : (
             <div className="mb-3 space-y-2">
               {artifacts.map(artifact => (
                 <div
                   key={artifact.id}
-                  className="flex min-w-0 flex-col gap-1 bg-card-white/5 px-2 py-2 sm:flex-row sm:items-center sm:gap-2"
+                  className="flex min-w-0 flex-col gap-2 bg-card-white/5 px-2 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
                 >
-                  <span className="font-pixel text-[8px] text-accent-purple">
-                    {artifact.kind.replace('_', ' ').toUpperCase()}
-                  </span>
-                  <a
-                    href={artifact.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex min-h-10 min-w-0 items-center break-all font-dunggeunmo text-sm text-accent-orange hover:underline sm:truncate"
+                  <div className="min-w-0 flex-1">
+                    <span className="font-pixel text-[8px] text-accent-purple">
+                      {artifact.kind.replace('_', ' ').toUpperCase()}
+                    </span>
+                    <a
+                      href={artifact.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-flex min-h-10 min-w-0 items-center break-all font-dunggeunmo text-sm leading-snug text-accent-orange hover:underline sm:max-w-full"
+                    >
+                      {artifact.label || artifact.url}
+                    </a>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteLink(artifact.id)}
+                    className="min-h-9 self-start border border-accent-pink/40 px-2 py-1 font-pixel text-[8px] text-accent-pink transition-colors hover:bg-accent-pink/10 sm:self-center"
+                    aria-label={`링크 ${artifact.label || artifact.url} 삭제`}
                   >
-                    {artifact.label || artifact.url}
-                  </a>
+                    삭제
+                  </button>
                 </div>
               ))}
             </div>
@@ -790,7 +896,7 @@ export default function WarRoomPage() {
               value={newLinkLabel}
               onChange={event => setNewLinkLabel(event.target.value)}
               className="min-h-10 min-w-0 border-2 border-dark-border bg-dark-bg/30 px-3 py-2 font-dunggeunmo text-sm text-card-white"
-              placeholder="라벨"
+              placeholder="링크 이름"
             />
             <input
               value={newLinkUrl}
@@ -803,6 +909,9 @@ export default function WarRoomPage() {
               추가
             </PixelButton>
           </div>
+          <p className="mt-2 font-dunggeunmo text-xs leading-snug text-card-white/30">
+            링크 이름을 비워 두면 URL이 그대로 표시됩니다.
+          </p>
           {submissionId && (
             <p className="mt-2 font-dunggeunmo text-xs text-card-white/30">
               현재 팀 제출 ID: {submissionId}

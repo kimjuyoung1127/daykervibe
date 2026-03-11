@@ -48,8 +48,11 @@ Source of truth for route-level execution status.
   - 해커톤 태그 텍스트 강조 (`font-dunggeunmo text-xs font-bold`)
 - `/hackathons`
   - 카드 그리드 `lg:grid-cols-3`, 썸네일 `max-h-[160px]`, 패딩 `p-3`
+  - 상태 필터와 함께 쓰는 태그 필터 추가
+  - 모바일 `<select>` + 데스크톱 버튼 행으로 태그 탐색 보강
 - `/hackathons/:slug`
   - 배너 이미지 데스크톱 `lg:w-3/5 lg:mx-auto`
+  - 팀 섹션 모집 역할 칩을 RECRUIT HUB와 동일한 스타일로 통일
 - `/war-room/:teamId`
   - BASECAMP 카드 `variant="dark"` 적용
   - 워크플로 컬럼 제목, 제출 단계 버튼, 팀 구성 뱃지 텍스트 강조
@@ -93,3 +96,25 @@ Source of truth for route-level execution status.
 - `/war-room/:teamId`
   - imports pending public submit drafts into team-local state
   - basecamp white-card contrast was aligned with the home-card readability rule
+- `/camp`
+  - 모집 역할 `lookingFor[]`를 읽기 쉬운 칩으로 유지하고 상세 팀 섹션과 스타일을 통일
+  - 생성 폼에 역할 선택 UI 추가 (기본 칩 선택 + 직접 입력 + 선택 제거)
+
+## 2026-03-11 Addendum - Camp CRUD and State UI
+
+- `/camp`
+  - 생성/수정 폼에 `isOpen` 입력 추가
+  - 커스텀 팀만 `수정`, `모집 마감` 액션 허용
+  - 수정 모드 프리필과 `updatedAt` 갱신 추가
+- `/`
+  - 로드 실패 시 `ErrorState`, 데이터 없음 시 `EmptyState` 보강
+- `/hackathons`
+  - 로드 실패 시 `ErrorState` 보강
+- `/hackathons/:slug`
+  - 섹션 카탈로그가 비어 있을 때 `EmptyState` 처리
+  - bootstrap 예외를 `ErrorState`로 수렴
+- `/rankings`
+  - 로드 실패 시 `ErrorState` 보강
+- `/war-room/:teamId`
+  - 데이터 bootstrap 예외를 `ErrorState`로 수렴
+  - 워크플로/체크리스트/링크 빈 상태를 공통 `EmptyState`로 정리

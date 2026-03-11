@@ -1,5 +1,19 @@
 # Expedition Hub Wireframe
 
+## 2026-03-11 Camp CRUD and State UI Addendum
+
+- `/camp`
+  - 생성 폼과 수정 폼은 같은 화면에서 동작한다
+  - 폼 필수 입력에는 `모집중 여부`가 포함된다
+  - 커스텀 팀만 `수정`, `모집 마감` 액션을 가진다
+  - 시드 공개 팀은 계속 읽기 전용 공개 카드로 남는다
+- Common states
+  - 핵심 6개 라우트는 `LoadingState`, `EmptyState`, `ErrorState`를 모두 가질 수 있다
+  - not found는 detail / war-room에서 `ErrorState`로 유지한다
+- Design references
+  - 2026-03-10에 정적 `public/design_reference/*` 이미지는 제거됐다
+  - 현재 와이어프레임 확인 기준은 라이브 라우트 구현과 `docs/evidence/*` 캡처다
+
 ## 2026-03-10 SSOT Strict Alignment Addendum
 
 - `/hackathons/:slug`
@@ -26,18 +40,18 @@
   - workflow board supports desktop drag-and-drop and mobile move-button fallback
   - when a public submit draft exists, the war-room shows an import notice after it absorbs that draft
 
-Last Updated: 2026-03-09 (KST)
+Last Updated: 2026-03-11 (KST)
 
 ## Design References
 | 페이지 | 레퍼런스 파일 |
 |--------|-------------|
-| `/` 랜딩 | `public/design_reference/landing_page.png` |
-| `/hackathons` 목록 | `public/design_reference/hackathon_listing.png` |
-| `/hackathons/:slug` 상세 | `public/design_reference/hackathon_detail.png` |
-| `/camp` 원정대 모집 | `public/design_reference/camp_recruitment.png` |
-| `/rankings` 랭킹 | `public/design_reference/rankings.png` |
-| `/war-room/:teamId` 작전실 | `public/design_reference/war_room.png` |
-| 공통 컴포넌트 스타일 | `public/design_reference/1.png` |
+| `/` 랜딩 | 라이브 구현 + `docs/evidence/responsive-qa-phase2-playwright-2026-03-10.md` |
+| `/hackathons` 목록 | 라이브 구현 + `docs/evidence/responsive-qa-phase2-playwright-2026-03-10.md` |
+| `/hackathons/:slug` 상세 | 라이브 구현 + `docs/evidence/responsive-qa-phase2-playwright-2026-03-10.md` |
+| `/camp` 원정대 모집 | 라이브 구현 + `docs/evidence/responsive-qa-phase2-playwright-2026-03-10.md` |
+| `/rankings` 랭킹 | 라이브 구현 |
+| `/war-room/:teamId` 작전실 | 라이브 구현 + `docs/evidence/war-room-drag-and-privacy-verification-2026-03-10.md` |
+| 공통 컴포넌트 스타일 | `src/components/ui/*`, `src/app/globals.css` |
 
 ## 1. 디자인 방향
 - 8비트 게이머 감성
@@ -57,8 +71,8 @@ Last Updated: 2026-03-09 (KST)
 - Border Dark: `#1A1A1A`
 
 ### 2.2 Typography
-- **영문 타이틀/헤더**: `Press Start 2P` (`public/fonts/press-start-2p/PressStart2P.ttf`)
-- **한글 타이틀/본문**: `DungGeunMo` (`public/fonts/DungGeunMo/DungGeunMo.ttf`)
+- **영문 타이틀/헤더**: `Press Start 2P` (`public/fonts/press-start-2p/PressStart2P.woff2`, source assets 함께 보존)
+- **한글 타이틀/본문**: `DungGeunMo` (`public/fonts/DungGeunMo/DungGeunMo.woff2`, source assets 함께 보존)
 - Body: DungGeunMo 또는 시스템 sans-serif fallback
 - Small: compact pixel-inspired label text
 

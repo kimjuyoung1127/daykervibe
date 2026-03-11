@@ -13,8 +13,10 @@ import Card from '@/components/ui/Card';
 import StatusBadge from '@/components/ui/StatusBadge';
 import LoadingState from '@/components/ui/LoadingState';
 import EmptyState from '@/components/ui/EmptyState';
+import ErrorState from '@/components/ui/ErrorState';
 
 type FilterKey = 'all' | HackathonStatus;
+type TagFilterKey = 'all' | string;
 
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'all', label: '전체' },
@@ -23,17 +25,37 @@ const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'ended', label: '종료' },
 ];
 
+const STATUS_PRIORITY: Record<HackathonStatus, number> = {
+  upcoming: 0,
+  ongoing: 1,
+  ended: 2,
+};
 export default function HackathonsPage() {
   const [hackathons, setHackathons] = useState<Hackathon[] | null>(null);
   const [filter, setFilter] = useState<FilterKey>('all');
+  const [tagFilter, setTagFilter] = useState<TagFilterKey>('all');
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     queueMicrotask(() => {
       if (cancelled) return;
-      const data = getItem<Hackathon[]>(STORAGE_KEYS.HACKATHONS);
-      setHackathons(data ?? []);
+      try {
+        const data = getItem<Hackathon[]>(STORAGE_KEYS.HACKATHONS);
+
+        if (data !== null && !Array.isArray(data)) {
+          throw new Error('해커톤 목록 데이터를 불러오지 못했습니다.');
+        }
+
+        setHackathons(data ?? []);
+        setLoadError(null);
+      } catch (error) {
+        setHackathons([]);
+        setLoadError(
+          error instanceof Error ? error.message : '해커톤 목록 데이터를 불러오지 못했습니다.',
+        );
+      }
     });
 
     return () => {
@@ -42,15 +64,35 @@ export default function HackathonsPage() {
   }, []);
 
   if (hackathons === null) return <LoadingState />;
+  if (loadError) {
+    return (
+      <PageShell>
+        <ErrorState message={loadError} />
+      </PageShell>
+    );
+  }
 
   const normalizedHackathons = hackathons.map(hackathon => ({
     ...hackathon,
     status: getDisplayHackathonStatus(hackathon.status, hackathon.eventEndAt),
   }));
 
-  const filtered = normalizedHackathons.filter(
-    hackathon => filter === 'all' || hackathon.status === filter,
-  );
+  const availableTags = Array.from(
+    new Set(normalizedHackathons.flatMap(hackathon => hackathon.tags)),
+  ).sort((a, b) => a.localeCompare(b, 'ko-KR'));
+
+  const filtered = normalizedHackathons
+    .map((hackathon, index) => ({ hackathon, index }))
+    .filter(({ hackathon }) => filter === 'all' || hackathon.status === filter)
+    .filter(({ hackathon }) => tagFilter === 'all' || hackathon.tags.includes(tagFilter))
+    .sort((a, b) => {
+      const priorityDiff =
+        STATUS_PRIORITY[a.hackathon.status] - STATUS_PRIORITY[b.hackathon.status];
+
+      if (priorityDiff !== 0) return priorityDiff;
+      return a.index - b.index;
+    })
+    .map(({ hackathon }) => hackathon);
 
   return (
     <PageShell>
@@ -77,6 +119,52 @@ export default function HackathonsPage() {
             {f.label}
           </button>
         ))}
+        <div className="w-full sm:hidden">
+          <label
+            htmlFor="hackathon-tag-filter"
+            className="mb-1 block font-dunggeunmo text-xs text-card-white/50"
+          >
+            태그 필터
+          </label>
+          <select
+            id="hackathon-tag-filter"
+            value={tagFilter}
+            onChange={event => setTagFilter(event.target.value)}
+            className="min-h-10 w-full border-2 border-dark-border bg-dark-bg/30 px-3 py-2 font-dunggeunmo text-sm text-card-white"
+          >
+            <option value="all">전체 태그</option>
+            {availableTags.map(tag => (
+              <option key={tag} value={tag}>
+                {tag}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="hidden w-full flex-wrap gap-2 sm:flex">
+          <button
+            onClick={() => setTagFilter('all')}
+            className={`min-h-9 border px-3 py-1.5 font-dunggeunmo text-xs transition-colors ${
+              tagFilter === 'all'
+                ? 'border-accent-mint bg-accent-mint/15 text-accent-mint'
+                : 'border-dark-border text-card-white/60 hover:border-card-white/40'
+            }`}
+          >
+            전체 태그
+          </button>
+          {availableTags.map(tag => (
+            <button
+              key={tag}
+              onClick={() => setTagFilter(tag)}
+              className={`min-h-9 border px-3 py-1.5 font-dunggeunmo text-xs font-bold transition-colors ${
+                tagFilter === tag
+                  ? 'border-accent-mint bg-accent-mint/15 text-accent-mint'
+                  : 'border-dark-border text-card-white/60 hover:border-card-white/40'
+              }`}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
         <span className="basis-full font-dunggeunmo text-xs text-card-white/50">
           {filtered.length} / {hackathons.length}
         </span>
@@ -102,42 +190,42 @@ export default function HackathonsPage() {
                     />
                   </div>
                 )}
-                <div className="mb-2 flex items-start justify-between gap-3">
+                <div className="mb-2 flex items-start justify-between gap-2">
                   <StatusBadge status={hackathon.status} />
                   {hackathon.teamCount !== undefined && (
-                    <span className="font-dunggeunmo text-xs text-dark-bg/60">
+                    <span className="shrink-0 text-right font-dunggeunmo text-[11px] leading-tight text-dark-bg/60 sm:text-xs">
                       {hackathon.teamCount} teams
                     </span>
                   )}
                 </div>
 
-                <h3 className="mb-2 font-dunggeunmo text-base font-bold line-clamp-2">
+                <h3 className="mb-2 break-words font-dunggeunmo text-base font-bold leading-snug line-clamp-2">
                   {hackathon.title}
                 </h3>
 
                 {hackathon.summary && (
-                  <p className="mb-3 font-dunggeunmo text-sm text-dark-bg/72 line-clamp-2">
+                  <p className="mb-3 break-words font-dunggeunmo text-sm leading-snug text-dark-bg/72 line-clamp-2">
                     {hackathon.summary}
                   </p>
                 )}
 
-                <p className="mb-3 font-dunggeunmo text-xs text-dark-bg/60">
+                <p className="mb-3 font-dunggeunmo text-[11px] leading-snug text-dark-bg/60 sm:text-xs">
                   {formatDate(hackathon.eventStartAt)} ~ {formatDate(hackathon.eventEndAt)}
                 </p>
 
-                <div className="mt-auto flex items-end justify-between gap-3">
-                  <div className="flex flex-wrap gap-1">
+                <div className="mt-auto flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
+                  <div className="flex flex-wrap gap-1.5">
                     {hackathon.tags.slice(0, 3).map(tag => (
                       <span
                         key={tag}
-                        className="rounded-sm bg-dark-bg/10 px-2 py-0.5 font-pixel text-[8px] text-dark-bg/80"
+                        className="max-w-full break-words rounded-sm bg-dark-bg/10 px-2 py-0.5 font-pixel text-[8px] leading-tight text-dark-bg/80"
                       >
                         {tag}
                       </span>
                     ))}
                   </div>
                   {hackathon.prizeTotalKRW > 0 && (
-                    <span className="font-pixel text-[10px] text-dark-bg/80">
+                    <span className="font-pixel text-[10px] leading-tight text-dark-bg/80">
                       {formatPrize(hackathon.prizeTotalKRW)}
                     </span>
                   )}
